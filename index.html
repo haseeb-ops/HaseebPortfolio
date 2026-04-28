@@ -321,6 +321,7 @@
   @media (max-width: 700px) { .portfolio-grid { grid-template-columns: 1fr 1fr; } }
   @media (max-width: 440px) { .portfolio-grid { grid-template-columns: 1fr; } }
 
+ /*
   .portfolio-grid .work-item:first-child {
     grid-column: span 2;
     aspect-ratio: 16/9;
@@ -328,6 +329,8 @@
   @media (max-width: 440px) {
     .portfolio-grid .work-item:first-child { grid-column: span 1; aspect-ratio: 4/3; }
   }
+
+ */
 
   /* Each work card */
   .work-item {
@@ -749,6 +752,14 @@
         <div class="work-cat">Bottle Label Print</div>
       </div>
     </div>
+
+   <!-- Work 19 -->
+    <div class="work-item" data-cat="Business Card Print" onclick="openLightbox(this)">
+      <img src="images/bc1.jpg" alt="Business Card Print">
+      <div class="work-overlay">
+        <div class="work-cat">Business Card Print</div>
+      </div>
+    </div>
    
     <!-- Work 7 -->
     <div class="work-item" data-cat="Logo" onclick="openLightbox(this)">
@@ -900,14 +911,6 @@
       <img src="images/l3.jpg" alt="Logo">
       <div class="work-overlay">
         <div class="work-cat">Logo</div>
-      </div>
-    </div>
-   
-    <!-- Work 19 -->
-    <div class="work-item" data-cat="Business Card Print" onclick="openLightbox(this)">
-      <img src="images/bc1.jpg" alt="Business Card Print">
-      <div class="work-overlay">
-        <div class="work-cat">Business Card Print</div>
       </div>
     </div>
 
