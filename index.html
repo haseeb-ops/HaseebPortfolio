@@ -1041,18 +1041,22 @@
     });
   }
 
+  
   // ── SHOW ALL / COLLAPSE ──
   let showingAll = false;
   function toggleShowAll() {
     showingAll = !showingAll;
-    const extra = document.getElementById('extraGrid');
-    const btn   = document.getElementById('showAllBtn');
+    const extra       = document.getElementById('extraGrid');
+    const showAllRow  = document.getElementById('showAllBtn').parentElement;
+    const collapseRow = document.getElementById('collapseRow');
     if (showingAll) {
       extra.classList.add('open');
-      btn.textContent = 'Collapse ↑';
+      showAllRow.style.display  = 'none';
+      collapseRow.style.display = 'flex';
     } else {
       extra.classList.remove('open');
-      btn.textContent = 'Show All Works ↓';
+      showAllRow.style.display  = 'flex';
+      collapseRow.style.display = 'none';
       document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
     }
   }
@@ -1066,6 +1070,7 @@
     }
   });
 
+ 
   // ── LIGHTBOX ──
   function openLightbox(el) {
     const img   = el.querySelector('img');
