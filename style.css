@@ -143,6 +143,7 @@
   }
   .btn-primary {
     padding: 0.85rem 2rem;
+    text-align: center;
     background: var(--ink);
     color: var(--cream);
     font-size: 0.78rem;
@@ -155,6 +156,7 @@
   .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
   .btn-outline {
     padding: 0.85rem 2rem;
+    text-align: center;
     border: 1.5px solid var(--ink);
     color: var(--ink);
     font-size: 0.78rem;
