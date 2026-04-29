@@ -80,6 +80,7 @@
   .nav-links a {
     font-size: 0.78rem;
     letter-spacing: 0.12em;
+    font-weight: 400;
     text-transform: uppercase;
     color: var(--muted);
     text-decoration: none;
@@ -145,6 +146,7 @@
     background: var(--ink);
     color: var(--cream);
     font-size: 0.78rem;
+    border-radius: 8px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
@@ -156,6 +158,7 @@
     border: 1.5px solid var(--ink);
     color: var(--ink);
     font-size: 0.78rem;
+    border-radius: 8px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
@@ -163,61 +166,197 @@
   }
   .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
 
-  .hero-right {
-    position: relative;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--ink);
+    
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
+
+  @keyframes psc-slideUp {
+    from { opacity: 0; transform: translateY(36px) scale(.96); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);   }
+  }
+  @keyframes psc-btnPop {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0);    }
+  }
+  @keyframes psc-ripple {
+    to { transform: scale(5); opacity: 0; }
+  }
+  @keyframes psc-shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position:  200% center; }
+  }
+
+  .psc-phone-mockup {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .psc-phone-frame {
+    background: #0e0e0e;
+    border-radius: 50px;
+    padding: 10px;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      0 0 0 1px rgba(0,0,0,0.5),
+      0 40px 80px rgba(0,0,0,0.35);
+    width: clamp(240px, 28vw, 340px);
+  }
+
+  .psc-phone-screen {
+    border-radius: 38px;
     overflow: hidden;
-    opacity: 0; animation: fadeIn 1s 0.4s forwards;
+    background: #181818;
   }
-  .hero-right::before {
-    position: absolute; inset: 0;
-   /* background: radial-gradient(ellipse at 60% 40%, rgba(200,80,42,0.25) 0%, transparent 65%); */
+
+  /* ── CARD ── */
+  .psc-card {
+    --psc-accent:    #c8502a;
+    --psc-accent-dk: #a03d1e;
+    --psc-glow:      rgba(200, 80, 42, 0.4);
+    --psc-surface:   #000;
+    --psc-border:    rgba(255,255,255,.08);
+    --psc-text:      #FFFFFF;
+    --psc-muted:     rgba(255,255,255,.45);
+
+    font-family: 'Outfit', sans-serif;
+    position: relative;
+    width: 100%;
+    background: var(--psc-surface);
+    overflow: hidden;
+    animation: psc-slideUp .65s cubic-bezier(.22,1,.36,1) both;
   }
-  .hero-portrait-wrap {
-    position: relative; z-index: 2;
-    width: 320px; height: 380px;
+
+  .psc-card *, .psc-card *::before, .psc-card *::after {
+    box-sizing: border-box; margin: 0; padding: 0;
   }
-  .hero-portrait-wrap img {
-    width: 100%; height: 100%;
+
+  .psc-card__img-wrap {
+    position: relative;
+    width: 100%;
+    height: clamp(220px, 30vw, 360px);
+    overflow: hidden;
+  }
+
+  .psc-card__img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    filter: grayscale(20%) contrast(1.05);
+    object-position: top center;
     display: block;
+    transition: transform .55s cubic-bezier(.25,1,.5,1);
   }
-  .hero-decor-circle {
-    position: absolute;
-    border: 1px solid rgba(200,80,42,0.4);
-    border-radius: 50%;
-  }
-  .hero-decor-circle:nth-child(1) { width: 420px; height: 420px; top: 50%; left: 50%; transform: translate(-50%,-50%); }
-  .hero-decor-circle:nth-child(2) { width: 560px; height: 560px; top: 50%; left: 50%; transform: translate(-50%,-50%); opacity: 0.4; }
-  .hero-stat-strip {
+
+  .psc-card:hover .psc-card__img { transform: scale(1.04); }
+
+  .psc-card__img-fade {
     position: absolute;
     bottom: 0; left: 0; right: 0;
+    height: 80px;
+    background: linear-gradient(to bottom, transparent, var(--psc-surface));
+    pointer-events: none;
+  }
+
+
+
+  .psc-card__body {
+    padding: 20px 24px 28px;
     display: flex;
-    background: rgba(245,240,232,0.06);
-    backdrop-filter: blur(6px);
-    border-top: 1px solid rgba(255,255,255,0.08);
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
   }
-  .hero-stat {
-    flex: 1;
-    padding: 1.4rem;
-    text-align: center;
-    border-right: 1px solid rgba(255,255,255,0.08);
+
+  .psc-card__rule {
+    width: 50px; height: 2px;
+    border-radius: 99px;
+    background: var(--psc-accent);
+    opacity: .85;
   }
-  .hero-stat:last-child { border-right: none; }
-  .hero-stat-num {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: var(--cream);
+
+  .psc-card__socials {
+    display: flex;
+    gap: 12px;
+    list-style: none;
   }
-  .hero-stat-label {
-    font-size: 0.65rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgba(245,240,232,0.45);
-    margin-top: 0.2rem;
+
+  .psc-card__btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 54px; height: 54px;
+    border-radius: 16px;
+    border: 1px solid var(--psc-border);
+    background: rgba(82,82,82);
+    color: var(--psc-muted);
+    text-decoration: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition:
+      color .22s ease,
+      background .22s ease,
+      border-color .22s ease,
+      box-shadow .22s ease,
+      transform .18s cubic-bezier(.34,1.56,.64,1);
+    animation: psc-btnPop .5s both;
+  }
+
+  .psc-card__btn:nth-child(1) { animation-delay: .45s; }
+  .psc-card__btn:nth-child(2) { animation-delay: .55s; }
+  .psc-card__btn:nth-child(3) { animation-delay: .65s; }
+
+  .psc-card__btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%);
+    background-size: 200% 100%;
+    animation: psc-shimmer 3s infinite;
+    pointer-events: none;
+  }
+
+  .psc-card__btn::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at center, rgba(255,255,255,.2) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0);
+    border-radius: inherit;
+    transition: transform .35s ease, opacity .35s ease;
+    pointer-events: none;
+  }
+
+  .psc-card__btn:hover {
+    color: var(--psc-text);
+    background: var(--psc-accent);
+    border-color: var(--psc-accent);
+    box-shadow: 0 6px 24px var(--psc-glow);
+    transform: translateY(-5px) scale(1.06);
+  }
+
+  .psc-card__btn:active {
+    transform: translateY(1px) scale(.94);
+    box-shadow: 0 2px 8px var(--psc-glow);
+  }
+
+  .psc-card__btn:active::after { opacity: 1; transform: scale(2.8); }
+
+  .psc-card__btn svg {
+    width: 22px; height: 22px;
+    fill: currentColor;
+    display: block;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .psc-card__ripple-span {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255,255,255,.3);
+    transform: scale(0);
+    animation: psc-ripple .5s linear forwards;
+    pointer-events: none;
+    z-index: 2;
   }
 
 
@@ -233,7 +372,7 @@
   }
   .section-label::after {
     content: ''; flex: 1;
-    height: 1px; background: var(--border);
+    height: 2px; background: var(--border);
     max-width: 60px;
   }
   .section-title {
@@ -512,7 +651,7 @@
     font-size: 1rem; font-weight: 700;
   }
 
-  /* ── ANIMATIONS ── */
+    /* ── ANIMATIONS ── */
   @keyframes fadeUp {
     from { opacity: 0; transform: translateY(22px); }
     to   { opacity: 1; transform: translateY(0); }
@@ -553,9 +692,6 @@
   }
 
 
-
-
-
   /* ── RESPONSIVE ── */
   @media (max-width: 900px) {
     nav { padding: 1.2rem 1.5rem; }
@@ -567,204 +703,4 @@
     section { padding: 5rem 1.5rem; }
     .portfolio-header { flex-direction: column; align-items: flex-start; }
     footer { flex-direction: column; gap: 0.5rem; text-align: center; }
-  }
-  
-  
-  
-  
-  
-  
-  
-  
-  
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
-
-  @keyframes psc-slideUp {
-    from { opacity: 0; transform: translateY(36px) scale(.96); }
-    to   { opacity: 1; transform: translateY(0)    scale(1);   }
-  }
-  @keyframes psc-btnPop {
-    from { opacity: 0; transform: translateY(14px); }
-    to   { opacity: 1; transform: translateY(0);    }
-  }
-  @keyframes psc-ripple {
-    to { transform: scale(5); opacity: 0; }
-  }
-  @keyframes psc-shimmer {
-    0%   { background-position: -200% center; }
-    100% { background-position:  200% center; }
-  }
-
-  .psc-phone-mockup {
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-  }
-
-  .psc-phone-frame {
-    background: #0e0e0e;
-    border-radius: 50px;
-    padding: 10px;
-    box-shadow:
-      inset 0 1px 0 rgba(255,255,255,0.08),
-      0 0 0 1px rgba(0,0,0,0.5),
-      0 40px 80px rgba(0,0,0,0.35);
-    width: clamp(240px, 28vw, 340px);
-  }
-
-  .psc-phone-screen {
-    border-radius: 38px;
-    overflow: hidden;
-    background: #181818;
-  }
-
-  /* ── CARD ── */
-  .psc-card {
-    --psc-accent:    #c8502a;
-    --psc-accent-dk: #a03d1e;
-    --psc-glow:      rgba(200, 80, 42, 0.4);
-    --psc-surface:   #000;
-    --psc-border:    rgba(255,255,255,.08);
-    --psc-text:      #FFFFFF;
-    --psc-muted:     rgba(255,255,255,.45);
-
-    font-family: 'Outfit', sans-serif;
-    position: relative;
-    width: 100%;
-    background: var(--psc-surface);
-    overflow: hidden;
-    animation: psc-slideUp .65s cubic-bezier(.22,1,.36,1) both;
-  }
-
-  .psc-card *, .psc-card *::before, .psc-card *::after {
-    box-sizing: border-box; margin: 0; padding: 0;
-  }
-
-  .psc-card__img-wrap {
-    position: relative;
-    width: 100%;
-    height: clamp(220px, 30vw, 360px);
-    overflow: hidden;
-  }
-
-  .psc-card__img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top center;
-    display: block;
-    transition: transform .55s cubic-bezier(.25,1,.5,1);
-  }
-
-  .psc-card:hover .psc-card__img { transform: scale(1.04); }
-
-  .psc-card__img-fade {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 80px;
-    background: linear-gradient(to bottom, transparent, var(--psc-surface));
-    pointer-events: none;
-  }
-
-
-
-  .psc-card__body {
-    padding: 20px 24px 28px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 18px;
-  }
-
-  .psc-card__rule {
-    width: 50px; height: 2px;
-    border-radius: 99px;
-    background: var(--psc-accent);
-    opacity: .85;
-  }
-
-  .psc-card__socials {
-    display: flex;
-    gap: 12px;
-    list-style: none;
-  }
-
-  .psc-card__btn {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 54px; height: 54px;
-    border-radius: 16px;
-    border: 1px solid var(--psc-border);
-    background: rgba(82,82,82);
-    color: var(--psc-muted);
-    text-decoration: none;
-    cursor: pointer;
-    overflow: hidden;
-    transition:
-      color .22s ease,
-      background .22s ease,
-      border-color .22s ease,
-      box-shadow .22s ease,
-      transform .18s cubic-bezier(.34,1.56,.64,1);
-    animation: psc-btnPop .5s both;
-  }
-
-  .psc-card__btn:nth-child(1) { animation-delay: .45s; }
-  .psc-card__btn:nth-child(2) { animation-delay: .55s; }
-  .psc-card__btn:nth-child(3) { animation-delay: .65s; }
-
-  .psc-card__btn::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%);
-    background-size: 200% 100%;
-    animation: psc-shimmer 3s infinite;
-    pointer-events: none;
-  }
-
-  .psc-card__btn::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: radial-gradient(circle at center, rgba(255,255,255,.2) 0%, transparent 70%);
-    opacity: 0;
-    transform: scale(0);
-    border-radius: inherit;
-    transition: transform .35s ease, opacity .35s ease;
-    pointer-events: none;
-  }
-
-  .psc-card__btn:hover {
-    color: var(--psc-text);
-    background: var(--psc-accent);
-    border-color: var(--psc-accent);
-    box-shadow: 0 6px 24px var(--psc-glow);
-    transform: translateY(-5px) scale(1.06);
-  }
-
-  .psc-card__btn:active {
-    transform: translateY(1px) scale(.94);
-    box-shadow: 0 2px 8px var(--psc-glow);
-  }
-
-  .psc-card__btn:active::after { opacity: 1; transform: scale(2.8); }
-
-  .psc-card__btn svg {
-    width: 22px; height: 22px;
-    fill: currentColor;
-    display: block;
-    flex-shrink: 0;
-    position: relative;
-    z-index: 1;
-  }
-
-  .psc-card__ripple-span {
-    position: absolute;
-    border-radius: 50%;
-    background: rgba(255,255,255,.3);
-    transform: scale(0);
-    animation: psc-ripple .5s linear forwards;
-    pointer-events: none;
-    z-index: 2;
   }
