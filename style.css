@@ -705,14 +705,3 @@
     footer { flex-direction: column; gap: 0.5rem; text-align: center; }
   }
 
-
-
-.img-wrap { position: relative; }
-
-.img-overlay {
-  position: absolute; inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex; align-items: center; justify-content: center;
-  transition: opacity 0.5s ease;
-}
-.img-overlay.done { opacity: 0; pointer-events: none; }
