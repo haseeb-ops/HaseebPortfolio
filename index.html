@@ -499,6 +499,16 @@
   }
 
 
+    document.querySelectorAll('.portfolio-img').forEach(img => {
+      const overlay = img.previousElementSibling;
+      const done = () => overlay.classList.add('done');
+      if (img.complete) done();
+      else img.addEventListener('load', done);
+      img.addEventListener('error', done);
+    });
+
+
+
   document.querySelectorAll('[data-psc-btn]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         var ripple = document.createElement('span');
