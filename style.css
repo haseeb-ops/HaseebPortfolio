@@ -138,14 +138,15 @@
     opacity: 0; animation: fadeUp 0.8s 0.5s forwards;
   }
   .hero-cta {
-    display: flex; gap: 1rem;
+    display: flex; 
+    gap: 1rem;
     opacity: 0; animation: fadeUp 0.8s 0.65s forwards;
   }
+  
   .btn-primary {
+    width: fit-content;
+    white-space: nowrap;
     padding: 0.85rem 2rem;
-    display: flex;
-    justify-content: center;  /* horizontal */
-    align-items: center;      /* vertical */
     background: var(--ink);
     color: var(--cream);
     font-size: 0.78rem;
@@ -157,10 +158,9 @@
   }
   .btn-primary:hover { background: var(--accent); transform: translateY(-2px); }
   .btn-outline {
+    width: fit-content;
+    white-space: nowrap;
     padding: 0.85rem 2rem;
-    display: flex;
-    justify-content: center;  /* horizontal */
-    align-items: center;      /* vertical */
     border: 1.5px solid var(--ink);
     color: var(--ink);
     font-size: 0.78rem;
