@@ -76,11 +76,11 @@
     color: var(--ink);
     text-decoration: none;
   }
-  .nav-links { display: flex; gap: 2.2rem; list-style: none; }
+  .nav-links { display: flex; gap: 2.3rem; list-style: none; }
   .nav-links a {
     font-size: 0.78rem;
     letter-spacing: 0.12em;
-    font-weight: 400;
+    font-weight: 500;
     text-transform: uppercase;
     color: var(--muted);
     text-decoration: none;
@@ -149,7 +149,7 @@
     background: var(--ink);
     color: var(--cream);
     font-size: 0.78rem;
-    border-radius: 8px;
+    border-radius: 0.3rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
@@ -164,7 +164,7 @@
     border: 1.5px solid var(--ink);
     color: var(--ink);
     font-size: 0.78rem;
-    border-radius: 8px;
+    border-radius: 0.3rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     text-decoration: none;
@@ -199,7 +199,7 @@
 
   .psc-phone-frame {
     background: #0e0e0e;
-    border-radius: 50px;
+    border-radius: 20px;
     padding: 10px;
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.08),
@@ -273,7 +273,7 @@
   }
 
   .psc-card__rule {
-    width: 50px; height: 2px;
+    width: 60px; height: 2px;
     border-radius: 99px;
     background: var(--psc-accent);
     opacity: .85;
@@ -281,7 +281,7 @@
 
   .psc-card__socials {
     display: flex;
-    gap: 15px;
+    gap: clamp(1rem, 3vw, 2rem);
     list-style: none;
   }
 
@@ -411,6 +411,7 @@
     padding: 0.45rem 1rem;
     border: 1px solid rgba(245,240,232,0.2);
     font-size: 0.72rem;
+    border-radius: 0.3rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
     color: rgba(245,240,232,0.7);
@@ -420,7 +421,8 @@
   .about-right { display: flex; flex-direction: column; gap: 2rem; }
   .exp-item {
     padding: 1.6rem;
-    border: 1px solid rgba(245,240,232,0.1);
+    border: 1px solid rgba(245,240,232,0.2); 
+    border-radius: 0.3rem;
     transition: border-color 0.2s;
   }
   .exp-item:hover { border-color: rgba(200,80,42,0.4); }
@@ -473,6 +475,7 @@
   .work-item {
     position: relative;
     overflow: hidden;
+    border-radius: 0.3rem;
     aspect-ratio: 4/3;
     background: var(--border);
     cursor: pointer;
@@ -512,6 +515,7 @@
   .btn-show-all {
     padding: 0.8rem 2.5rem;
     border: 1.5px solid var(--ink);
+    border-radius: 0.3rem;
     background: none; color: var(--ink);
     font-family: 'DM Sans', sans-serif;
     font-size: 0.75rem; letter-spacing: 0.14em;
@@ -568,7 +572,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1px;
-    border: 1px solid rgba(245,240,232,0.1);
+    border: 1px solid rgba(245,240,232,0.2);
+    border-radius: 0.3rem;
   }
   .service-card {
     padding: 2.5rem;
@@ -602,6 +607,7 @@
   .contact-info-icon {
     width: 36px; height: 36px;
     border: 1.5px solid var(--border);
+    border-radius: 0.3rem;
     display: flex; align-items: center; justify-content: center;
     font-size: 0.9rem;
     flex-shrink: 0;
@@ -615,6 +621,7 @@
   .form-input, .form-textarea {
     background: none;
     border: 1.5px solid var(--border);
+    border-radius: 0.3rem;
     padding: 0.85rem 1rem;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.9rem;
@@ -631,6 +638,7 @@
     background: var(--ink);
     color: var(--cream);
     border: none;
+    border-radius: 0.3rem;
     font-family: 'DM Sans', sans-serif;
     font-size: 0.78rem;
     letter-spacing: 0.12em;
@@ -640,6 +648,42 @@
     align-self: flex-start;
   }
   .form-submit:hover { background: var(--accent); }
+  
+  .form-select-wrap {
+    position: relative;
+  }
+  .form-select {
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    padding-right: 2.4rem; /* room for arrow */
+  }
+  .form-select-arrow {
+    position: absolute;
+    right: 0.95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+  }
+
+  /* Status feedback line */
+  .cf-status {
+    font-size: 0.82rem;
+    letter-spacing: 0.04em;
+    min-height: 1.2em;
+    display: none; /* shown via JS */
+  }
+  .cf-status.success { color: #2a7a4a; display: block; }
+  .cf-status.error   { color: var(--accent); display: block; }
+
+  /* Disabled-state button */
+  .form-submit:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
 
   /* ── FOOTER ── */
   footer {
