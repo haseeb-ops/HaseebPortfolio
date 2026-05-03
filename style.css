@@ -88,6 +88,24 @@
   }
   .nav-links a:hover { color: var(--accent); }
 
+/* --- TO UP BUTTON --- */
+
+  .to-up-btn{
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #c8502a;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 999;
+  }
+
   /* ── HERO ── */
   .hero {
     min-height: 100vh;
