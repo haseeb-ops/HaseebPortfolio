@@ -1,6 +1,5 @@
 # Haseeb K. — Portfolio Website
 
-![Portfolio Preview](https://haseeb-ops.github.io/HaseebPortfolio/Prifile.png)
 
 > Creative Graphic Designer skilled in Adobe Photoshop, Illustrator, and InDesign — crafting brand identities, social media designs, and marketing visuals that connect and convert.
 
