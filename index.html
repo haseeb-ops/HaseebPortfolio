@@ -94,11 +94,6 @@
       </div><!-- psc-phone-screen -->
     </div><!-- psc-phone-frame -->
   </div><!-- psc-phone-mockup -->
-  
-  
-  
-  
-    
 </section>
 
 <!-- ABOUT -->
@@ -694,6 +689,23 @@
   });
 })();
 
+
+// SCROLL REVEAL FOR EXPERIENCE ITEM ONLY
+  const elements = document.querySelectorAll('.exp-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show');
+      }
+    });
+  }, {
+    threshold: 0.3 // trigger when 30% visible 
+    });
+
+  elements.forEach(el => observer.observe(el));
+  
+  
   // ── SCROLL REVEAL ──
   const obs = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -702,9 +714,9 @@
         entry.target.style.transform = 'translateY(0)';
       }
     });
-  }, { threshold: 0.1 });
+  }, { threshold: 0.3 });
 
-  document.querySelectorAll('.exp-item, .service-card, .contact-left, .contact-form, .work-item').forEach(el => {
+  document.querySelectorAll('.service-card, .contact-left, .contact-form, .work-item').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(18px)';
     el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
