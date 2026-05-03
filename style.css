@@ -276,9 +276,9 @@
   }
 
   .psc-phone-screen {
-    border-radius: 38px;
+    border-radius: 20px;
     overflow: hidden;
-    background: #181818;
+    background: #0e0e0e;
   }
 
   /* ── CARD ── */
