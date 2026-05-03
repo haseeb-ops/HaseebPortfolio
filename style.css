@@ -452,7 +452,7 @@
   }
   .section-label::after {
     content: ''; flex: 1;
-    height: 2px; background: var(--border);
+    height: 1px; background: var(--border);
     max-width: 60px;
   }
   .section-title {
