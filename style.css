@@ -453,6 +453,7 @@
   .section-label::after {
     content: ''; flex: 1;
     height: 1px; background: var(--border);
+    min-width: 59px;  
     max-width: 60px;
   }
   .section-title {
@@ -768,7 +769,7 @@
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--muted);
+  color: va4r(--muted);
   opacity: 0.6;
 }
 
