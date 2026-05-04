@@ -32,15 +32,6 @@
   </ul>
 </nav>
 
-  <!-- SCROLL INDICATOR -->
-   <div class="indicator-flex">
-      <div class="indicator-container">
-         <div class="indicator-progress-bar" id="myBar"></div>
-      </div>
-   </div>
-
-
-
 
 <!-- TO UP BUTTON -->
 
@@ -629,17 +620,6 @@
 </div>
 
 <script>
-// When the user scrolls the page, execute myFunction 
-window.onscroll = function() {myFunction()};
-
-function myFunction() {
-  var winScroll = document.body.scrollTop || document.documentElement.scrollTop;
-  var height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  var scrolled = (winScroll / height) * 100;
-  document.getElementById("myBar").style.width = scrolled + "%";
-}
-
-
 
   // IMAGE LOADING EFFECT -----
   (function () {
