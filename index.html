@@ -618,41 +618,40 @@
 </div>
 
 <script>
+  // IMAGE LOADING EFFECT -----
+  (function () {
+    // Find every image on the page
+    document.querySelectorAll('img').forEach(function (img) {
 
-(function () {
-      // Find every image on the page
-      document.querySelectorAll('img').forEach(function (img) {
+      // Skip tiny icons / SVGs that don't need a skeleton
+      if (img.width < 60 && img.height < 60) return;
 
-        // Skip tiny icons / SVGs that don't need a skeleton
-        if (img.width < 60 && img.height < 60) return;
+      // Wrap the image in a skeleton container
+      var parent = img.parentNode;
+      var wrap   = document.createElement('div');
+      wrap.className = 'img-loader-wrap';
 
-        // Wrap the image in a skeleton container
-        var parent = img.parentNode;
-        var wrap   = document.createElement('div');
-        wrap.className = 'img-loader-wrap';
+      // Copy explicit width/height so the skeleton holds space
+      var cs = window.getComputedStyle(img);
+      if (cs.width  !== 'auto') wrap.style.width  = cs.width;
+      if (cs.height !== 'auto') wrap.style.height = cs.height;
 
-        // Copy explicit width/height so the skeleton holds space
-        var cs = window.getComputedStyle(img);
-        if (cs.width  !== 'auto') wrap.style.width  = cs.width;
-        if (cs.height !== 'auto') wrap.style.height = cs.height;
+      parent.insertBefore(wrap, img);
+      wrap.appendChild(img);
 
-        parent.insertBefore(wrap, img);
-        wrap.appendChild(img);
+      function reveal() {
+        wrap.classList.add('loaded');
+      }
 
-        function reveal() {
-          wrap.classList.add('loaded');
-        }
-
-        if (img.complete && img.naturalWidth > 0) {
-          // Already cached — reveal instantly (next frame for smooth CSS)
-          requestAnimationFrame(reveal);
-        } else {
-          img.addEventListener('load',  reveal);
-          img.addEventListener('error', reveal); // reveal on error too (shows broken icon)
-        }
-      });
-    })();
-
+      if (img.complete && img.naturalWidth > 0) {
+        // Already cached — reveal instantly (next frame for smooth CSS)
+        requestAnimationFrame(reveal);
+      } else {
+        img.addEventListener('load',  reveal);
+        img.addEventListener('error', reveal); // reveal on error too (shows broken icon)
+      }
+    });
+  })();
 
 
 
@@ -687,6 +686,8 @@
       });
    });
   
+  
+  
   // ── SHOW ALL / COLLAPSE ──
   let showingAll = false;
   function toggleShowAll() {
@@ -716,6 +717,7 @@
   });
 
  
+ 
   // ── LIGHTBOX ──
   function openLightbox(el) {
     const img   = el.querySelector('img');
@@ -735,69 +737,72 @@
     if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
   });
 
+
+
   // ── CONTACT FORM ──
   (function () {
-  const form   = document.getElementById('contactForm');
-  const btn    = document.getElementById('cf-btn');
-  const status = document.getElementById('cf-status');
-
-  if (!form) return;
-
-  form.addEventListener('submit', async function (e) {
-    e.preventDefault();
-
-    // Basic HTML5 validation check
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-
-    // UI: loading state
-    btn.disabled    = true;
-    btn.textContent = 'Sending…';
-    status.className = 'cf-status';
-    status.textContent = '';
-
-    try {
-      const data = new FormData(form);
-      const res  = await fetch(form.action, {
-        method:  'POST',
-        body:    data,
-        headers: { Accept: 'application/json' }
-      });
-
-      if (res.ok) {
-        // Success
-        status.textContent = '✓ Message sent! I\'ll get back to you soon.';
-        status.className   = 'cf-status success';
-        form.reset();
-        btn.textContent = 'Message Sent ✓';
-        setTimeout(() => {
-          btn.textContent = 'Send Message →';
-          btn.disabled    = false;
-          status.className = 'cf-status';
-          status.textContent = '';
-        }, 5000);
-      } else {
-        // Formspree returned an error
-        const json = await res.json().catch(() => ({}));
-        status.textContent = json.error || '✕ Something went wrong. Please try again.';
+    const form   = document.getElementById('contactForm');
+    const btn    = document.getElementById('cf-btn');
+    const status = document.getElementById('cf-status');
+  
+    if (!form) return;
+  
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+  
+      // Basic HTML5 validation check
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+  
+      // UI: loading state
+      btn.disabled    = true;
+      btn.textContent = 'Sending…';
+      status.className = 'cf-status';
+      status.textContent = '';
+  
+      try {
+        const data = new FormData(form);
+        const res  = await fetch(form.action, {
+          method:  'POST',
+          body:    data,
+          headers: { Accept: 'application/json' }
+        });
+  
+        if (res.ok) {
+          // Success
+          status.textContent = '✓ Message sent! I\'ll get back to you soon.';
+          status.className   = 'cf-status success';
+          form.reset();
+          btn.textContent = 'Message Sent ✓';
+          setTimeout(() => {
+            btn.textContent = 'Send Message →';
+            btn.disabled    = false;
+            status.className = 'cf-status';
+            status.textContent = '';
+          }, 5000);
+        } else {
+          // Formspree returned an error
+          const json = await res.json().catch(() => ({}));
+          status.textContent = json.error || '✕ Something went wrong. Please try again.';
+          status.className   = 'cf-status error';
+          btn.textContent    = 'Send Message →';
+          btn.disabled       = false;
+        }
+      } catch (_) {
+        // Network error
+        status.textContent = '✕ Network error. Check your connection and try again.';
         status.className   = 'cf-status error';
         btn.textContent    = 'Send Message →';
         btn.disabled       = false;
       }
-    } catch (_) {
-      // Network error
-      status.textContent = '✕ Network error. Check your connection and try again.';
-      status.className   = 'cf-status error';
-      btn.textContent    = 'Send Message →';
-      btn.disabled       = false;
-    }
-  });
-})();
+    });
+  })();
 
 
-// SCROLL REVEAL FOR EXPERIENCE ITEM ONLY
+
+  // SCROLL REVEAL FOR EXPERIENCE ITEM ONLY
   const elements = document.querySelectorAll('.exp-item');
 
   const observer = new IntersectionObserver((entries) => {
