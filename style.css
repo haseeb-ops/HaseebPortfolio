@@ -297,7 +297,7 @@
     width: 100%;
     background: var(--psc-surface);
     overflow: hidden;
-    animation: psc-slideUp .65s cubic-bezier(.22,1,.36,1) both;
+    animation: psc-slideUp 2s cubic-bezier(.22,1,.36,1) both;
   }
 
   .psc-card *, .psc-card *::before, .psc-card *::after {
