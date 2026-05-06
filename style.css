@@ -201,6 +201,23 @@
     justify-content: center;
     padding: 6rem 3.5rem 6rem 3.5rem;
   }
+  
+
+  .hero-grid-bg {
+    position: absolute;
+    inset: 0;
+  
+    background-image:
+      linear-gradient(rgba(200, 80, 42, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200, 80, 42, 0.2) 1px, transparent 1px);
+  
+    background-size: 50px 50px;
+  
+
+    mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(circle at center, black 40%, transparent 100%);
+  }
+  
   .hero-tag {
     font-size: 0.72rem;
     letter-spacing: 0.2em;
@@ -263,6 +280,7 @@
     width: fit-content;
     white-space: nowrap;
     padding: 0.85rem 2rem;
+    background: #fff;
     border: 1.5px solid var(--ink);
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     color: var(--ink);
@@ -555,6 +573,7 @@
     gap: 5rem;
     align-items: center;
   }
+  
   #about .section-label { color: var(--accent); }
   #about .section-label::after { background: rgba(245,240,232,0.15); }
   #about .section-title { color: var(--cream); margin-bottom: 1.5rem; }
