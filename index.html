@@ -463,7 +463,7 @@
       <div class="service-name">Social Media Design</div>
       <div class="service-desc">Eye-catching Instagram posts, stories, reels covers, and campaign creatives that drive engagement.</div>
     </div>
-    <div class="service-card">
+    <div class="service-card delay1">
       <span class="service-icon">◻</span>
       <div class="service-name">Print & Marketing</div>
       <div class="service-desc">Brochures, flyers, posters, and print-ready layouts with precise production specifications.</div>
@@ -844,11 +844,29 @@ window.onscroll = function () {
       if (entry.isIntersecting) {
         entry.target.style.opacity = '1';
         entry.target.style.transform = 'translateY(0)';
+        
+        if (window.innerWidth > 768 && entry.target.classList.contains('service-card')) {
+          setTimeout(() => {
+            entry.target.style.transitionDelay = '0s';
+          }, 800);
+        }
       }
     });
   }, { threshold: 0.3 });
-
-  document.querySelectorAll('.service-card, .contact-left, to-up-btn, .contact-form, .work-item').forEach(el => {
+  
+  document.querySelectorAll('.service-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+    
+    if (window.innerWidth > 768) {
+      el.style.transitionDelay = `${0.45 + i * 0.1}s`;
+    }
+    
+    obs.observe(el);
+  });
+  
+  document.querySelectorAll('.contact-left, to-up-btn, .contact-form, .work-item').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(18px)';
     el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
