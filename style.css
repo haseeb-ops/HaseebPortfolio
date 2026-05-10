@@ -752,11 +752,13 @@
   transition: background 0.22s, color 0.22s;
 }
 .ptab.active {
-  background: var(--ink);
+  background: var(--accent);
+  border-color: var(--accent);
   color: var(--cream);
 }
 .ptab:not(.active):hover {
   background: var(--ink);
+  transform: translateY(-2px);
   color: var(--cream);
 }
 
