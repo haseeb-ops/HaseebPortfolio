@@ -402,7 +402,7 @@
   justify-content: center;
   width: clamp(42px, 10vw, 52px);
   height: clamp(42px, 10vw, 52px);
-  border-radius: 50%;                          /* ← full circle */
+  border-radius: 20px;
   border: 1px solid var(--psc-border);
   background: rgba(82,82,82,0.55);
   color: var(--psc-muted);
@@ -530,6 +530,7 @@
   .psc-card__btn {
     width: clamp(40px, 10vw, 48px);
     height: clamp(40px, 10vw, 48px);
+    border-radius: 8px;
   }
 
   .psc-card__btn svg {
