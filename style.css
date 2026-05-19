@@ -299,26 +299,97 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap');
 
   
+.flame {
+  position: absolute;
+  top: 0; right: 0;
+  width: 90px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+}
+.flame::before {
+  content: '';
+  position: absolute;
+  top: -25px; right: -30px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FF6B2B 0%, rgba(200,80,20,.4) 50%, transparent 75%);
+  animation: flicker 3s ease-in-out infinite;
+}
+.flame::after {
+  content: '';
+  position: absolute;
+  bottom: 50px; right: -15px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,120,50,.5) 0%, transparent 70%);
+  animation: flicker 4s ease-in-out infinite reverse;
+}
 
+@keyframes flicker {
+  0%,100% { transform: scale(1) translate(0,0); opacity:.8; }
+  33%      { transform: scale(1.15) translate(-5px, 8px); opacity:1; }
+  66%      { transform: scale(.9) translate(4px, -6px); opacity:.6; }
+}
+
+/* ── ORBIT RING ── */
+.orbit-ring {
+  position: absolute;
+  top: 14px; right: 14px;
+  width: 52px; height: 52px;
+  z-index: 3;
+}
+.orbit-ring svg {
+  width: 100%; height: 100%;
+  animation: rotateSlow 8s linear infinite;
+}
+@keyframes rotateSlow { to { transform: rotate(360deg); } }
+
+/* ── STRIPE BADGE ── */
+.stripe-badge {
+  position: absolute;
+  top: 0; left: 0;
+  width: 80px; height: 80px;
+  z-index: 3;
+  overflow: hidden;
+  border-radius: 20px 0 0 0;
+}
+.stripe-badge::before {
+  content: '';
+  position: absolute;
+  top: -20px; left: -30px;
+  width: 120px; height: 120px;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(200,80,20,.25) 0px,
+    rgba(200,80,20,.25) 3px,
+    transparent 3px,
+    transparent 12px
+  );
+}
+
+/* ── PHONE MOCKUP ── */
 .psc-phone-mockup {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .psc-phone-frame {
   background: #000;
-  border-radius: 20px;
-  padding: 10px;
+  border-radius: 28px;
   box-shadow:
     inset 0 1px 0 rgba(255,255,255,0.08),
     0 0 0 1px rgba(0,0,0,0.5),
-    0 40px 80px rgba(0,0,0,0.35);
-  width: clamp(240px, 28vw, 340px);
+    0 40px 80px rgba(0,0,0,0.45);
+  width: clamp(220px, 85vw, 340px);
 }
 
 .psc-phone-screen {
-  border-radius: 20px;
+  border-radius: 28px;
   overflow: hidden;
   background: #0e0e0e;
 }
@@ -338,17 +409,18 @@
   width: 100%;
   background: var(--psc-surface);
   overflow: hidden;
-  animation: psc-slideUp 2s cubic-bezier(.22,1,.36,1) both;
+  animation: psc-slideUp 0.6s cubic-bezier(.22,1,.36,1) both;
 }
 
-.psc-card *, .psc-card *::before, .psc-card *::after {
-  box-sizing: border-box; margin: 0; padding: 0;
+@keyframes psc-slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .psc-card__img-wrap {
   position: relative;
   width: 100%;
-  height: clamp(220px, 30vw, 360px);
+  height: clamp(200px, 55vw, 320px);
   overflow: hidden;
 }
 
@@ -372,15 +444,15 @@
 }
 
 .psc-card__body {
-  padding: 20px 24px 28px;
+  padding: clamp(14px, 4vw, 20px) clamp(16px, 5vw, 24px) clamp(20px, 5vw, 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px;
+  gap: clamp(12px, 3vw, 18px);
 }
 
 .psc-card__rule {
-  width: 60px; height: 2px;
+  width: 50px; height: 2px;
   border-radius: 99px;
   background: var(--psc-accent);
   opacity: .85;
@@ -388,21 +460,21 @@
 
 .psc-card__socials {
   display: flex;
-  gap: clamp(0.6rem, 2vw, 1.25rem);
+  gap: clamp(8px, 2.5vw, 16px);
   list-style: none;
   flex-wrap: wrap;
   justify-content: center;
 }
 
-/* ── ROUND ICON BUTTONS ── */
+/* ── BUTTONS ── */
 .psc-card__btn {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: clamp(42px, 10vw, 52px);
-  height: clamp(42px, 10vw, 52px);
-  border-radius: 20px;
+  width: clamp(40px, 11vw, 52px);
+  height: clamp(40px, 11vw, 52px);
+  border-radius: clamp(10px, 2.5vw, 20px);
   border: 1px solid var(--psc-border);
   background: rgba(82,82,82,0.55);
   color: var(--psc-muted);
@@ -418,6 +490,11 @@
   animation: psc-btnPop .5s both;
 }
 
+@keyframes psc-btnPop {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
 .psc-card__btn:nth-child(1) { animation-delay: .45s; }
 .psc-card__btn:nth-child(2) { animation-delay: .55s; }
 .psc-card__btn:nth-child(3) { animation-delay: .65s; }
@@ -426,22 +503,15 @@
 .psc-card__btn::before {
   content: '';
   position: absolute; inset: 0;
-  border-radius: 50%;
   background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,.07) 50%, transparent 60%);
   background-size: 200% 100%;
   animation: psc-shimmer 3s infinite;
   pointer-events: none;
 }
 
-.psc-card__btn::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: radial-gradient(circle at center, rgba(255,255,255,.2) 0%, transparent 70%);
-  opacity: 0;
-  transform: scale(0);
-  border-radius: 50%;
-  transition: transform .35s ease, opacity .35s ease;
-  pointer-events: none;
+@keyframes psc-shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
 }
 
 .psc-card__btn:hover {
@@ -449,7 +519,7 @@
   background: var(--psc-accent);
   border-color: var(--psc-accent);
   box-shadow: 0 6px 24px var(--psc-glow);
-  transform: translateY(-5px) scale(1.1);
+  transform: translateY(-4px) scale(1.08);
 }
 
 .psc-card__btn:active {
@@ -457,10 +527,9 @@
   box-shadow: 0 2px 8px var(--psc-glow);
 }
 
-.psc-card__btn:active::after { opacity: 1; transform: scale(2.8); }
-
 .psc-card__btn svg {
-  width: 20px; height: 20px;
+  width: clamp(16px, 4.5vw, 20px);
+  height: clamp(16px, 4.5vw, 20px);
   fill: currentColor;
   display: block;
   flex-shrink: 0;
@@ -468,14 +537,56 @@
   z-index: 1;
 }
 
-.psc-card__ripple-span {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(255,255,255,.3);
-  transform: scale(0);
-  animation: psc-ripple .5s linear forwards;
-  pointer-events: none;
-  z-index: 2;
+/* ── SMALL SCREENS: shrink decorative elements ── */
+@media (max-width: 400px) {
+  .flame {
+    width: 60px;
+  }
+  .flame::before {
+    width: 70px;
+    height: 70px;
+    top: -15px; right: -20px;
+  }
+  .flame::after {
+    width: 40px;
+    height: 40px;
+    bottom: 30px; right: -8px;
+  }
+
+  .orbit-ring {
+    width: 36px; height: 36px;
+    top: 10px; right: 10px;
+  }
+
+  .stripe-badge {
+    width: 55px; height: 55px;
+  }
+
+  .psc-phone-frame {
+    border-radius: 20px;
+  }
+  .psc-phone-screen {
+    border-radius: 20px;
+  }
+}
+
+@media (max-width: 320px) {
+  .flame { display: none; }
+  .orbit-ring {
+    width: 28px; height: 28px;
+    top: 6px; right: 6px;
+  }
+  .stripe-badge { width: 44px; height: 44px; }
+
+  .psc-card__socials { gap: 6px; }
+
+  .psc-card__btn {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+  }
+  .psc-card__btn svg {
+    width: 15px; height: 15px;
+  }
 }
 
 /* ── RESPONSIVE ── */
