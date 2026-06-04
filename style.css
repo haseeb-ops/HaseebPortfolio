@@ -1063,6 +1063,19 @@
 .lb-arrow.lb-next { right: 1rem; }
 .lb-arrow.hidden { opacity: 0; pointer-events: none; }
 
+
+@media (max-width: 600px) {
+  .lb-arrow {
+    width: 40px; height: 40px; font-size: 0.85rem;
+    top: auto; bottom: 0.6rem;
+    transform: none;
+  }
+  .lb-arrow:hover { transform: none; }
+  .lb-arrow.lb-prev { left: 1.5rem; }
+  .lb-arrow.lb-next { right: 1.5rem; }
+  .lb-stage { padding: 3rem 1rem 3.5rem; }
+}
+
 /* Counter pill */
 .lb-counter {
   position: absolute; top: 1.1rem; left: 50%; transform: translateX(-50%);
