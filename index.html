@@ -212,7 +212,7 @@
     </div>
   </div>
 
-  <!-- ── TAB SWITCHER ── -->
+  <!-- TAB SWITCHER -->
   <div class="portfolio-tabs">
     <button class="ptab active" onclick="switchTab('design', this)">Graphic Design</button>
     <button class="ptab" onclick="switchTab('web', this)">Web Projects</button>
@@ -224,7 +224,30 @@
   <div class="tab-panel" id="panel-design">
 
     <div class="portfolio-grid" id="mainGrid">
+
+      <!--
+        SINGLE IMAGE  → just use <img src="...">  (same as before)
+        CAROUSEL      → add data-images='["img1.jpg","img2.jpg","img3.jpg"]'
+                        The first image in the array is also the preview thumb.
+
+        Examples below show both patterns.
+      -->
+
+      <!-- CAROUSEL EXAMPLE — Awareness Campaign (2 images) 
       
+      <div class="work-item"
+           data-cat="Awareness Campaign Poster"
+           data-images='["images/OrvaEnvironmentalDay.jpg"
+                          "images/OppamEarthDay.jpg"
+                          "]'
+           onclick="openLightbox(this)">
+        <img src="images/OrvaEnvironmentalDay.jpg" alt="Awareness Campaign Poster">
+        <div class="work-overlay"><div class="work-cat">Awareness Campaign Poster</div></div>
+      </div>
+      
+      -->
+
+      <!-- SINGLE IMAGE -->
       <div class="work-item" data-cat="Awareness Campaign Poster" onclick="openLightbox(this)">
         <img src="images/OrvaEnvironmentalDay.jpg" alt="Awareness Campaign Poster">
         <div class="work-overlay"><div class="work-cat">Awareness Campaign Poster</div></div>
@@ -238,6 +261,19 @@
       <div class="work-item" data-cat="Greeting Poster" onclick="openLightbox(this)">
         <img src="images/OrvaBakreeth.jpg" alt="Greeting Poster">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
+      </div>
+      
+      <div class="work-item"
+           data-cat="Awareness Campaign Carousel"
+           data-images='["images/OppamC1.jpg",
+                          "images/OppamC2.jpg",
+                          "images/OppamC3.jpg",
+                          "images/OppamC4.jpg",
+                          "images/OppamC5.jpg",
+                          "images/OppamC6.jpg"]'
+           onclick="openLightbox(this)">
+        <img src="images/OppamC1.jpg" alt="Awareness Campaign Carousel">
+        <div class="work-overlay"><div class="work-cat">Awareness Campaign Carousel</div></div>
       </div>
 
       <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
@@ -265,13 +301,7 @@
         <div class="work-overlay"><div class="work-cat">Branding</div></div>
       </div>
 
-      <div class="work-item" data-cat="Bottle Label Print" onclick="openLightbox(this)">
-        <img src="images/b1.jpg" alt="Bottle Label Print">
-        <div class="work-overlay"><div class="work-cat">Bottle Label Print</div></div>
-      </div>
 
-      
-      
     </div><!-- /mainGrid -->
 
     <div class="show-all-row">
@@ -280,6 +310,11 @@
 
     <div class="portfolio-grid-extra" id="extraGrid">
       
+      <div class="work-item" data-cat="Bottle Label Print" onclick="openLightbox(this)">
+        <img src="images/b1.jpg" alt="Bottle Label Print">
+        <div class="work-overlay"><div class="work-cat">Bottle Label Print</div></div>
+      </div>
+
       <div class="work-item" data-cat="Business Card Print" onclick="openLightbox(this)">
         <img src="images/bc1.jpg" alt="Business Card Print">
         <div class="work-overlay"><div class="work-cat">Business Card Print</div></div>
@@ -381,6 +416,7 @@
         <div class="work-overlay"><div class="work-cat">Thumbnail</div></div>
       </div>
 
+
     </div><!-- /extraGrid -->
 
     <div class="show-all-row" id="collapseRow" style="display:none; margin-top:1.5rem;">
@@ -393,10 +429,8 @@
        PANEL 2 — WEB PROJECTS
   ══════════════════════════════ -->
   <div class="tab-panel" id="panel-web" style="display:none;">
-
     <div class="web-projects-grid">
 
-      <!-- Website 1 -->
       <div class="web-card">
         <div class="web-card-browser">
           <div class="browser-bar">
@@ -419,34 +453,34 @@
         </div>
       </div>
 
-      <!-- Website 2 
-      <div class="web-card">
-        <div class="web-card-browser">
-          <div class="browser-bar">
-            <span class="browser-dot"></span>
-            <span class="browser-dot"></span>
-            <span class="browser-dot"></span>
-            <span class="browser-url">yoursite2.com</span>
-          </div>
-          <div class="web-card-preview">
-            <img src="images/website2-preview.jpg" alt="Website 2">
-            <a class="web-card-visit" href="https://yoursite2.com" target="_blank">Visit Site ↗</a>
-          </div>
-        </div>
-        <div class="web-card-info">
-          <div class="web-card-name">Website Name Two</div>
-          <div class="web-card-desc">A short description of what this site does or who it's for.</div>
-          <div class="web-card-tags">
-            <span>HTML</span><span>CSS</span><span>JavaScript</span>
-          </div>
-        </div>
-      </div>
-      -->
-
     </div>
   </div><!-- /panel-web -->
 
 </section>
+
+<!-- ── LIGHTBOX ────────────────────────────────────────────── -->
+<div id="lightbox" class="lightbox" onclick="closeLightbox(event)">
+
+  <button class="lightbox-close" onclick="closeLightbox(event)" aria-label="Close">✕</button>
+
+  <div class="lb-stage" id="lbStage">
+    <div class="lb-track" id="lbTrack"></div>
+    <!-- counter pill -->
+    <div class="lb-counter" id="lbCounter">1 / 1</div>
+    <!-- arrows -->
+    <button class="lb-arrow lb-prev hidden" id="lbPrev" onclick="lbGo(-1, event)" aria-label="Previous">&#8592;</button>
+    <button class="lb-arrow lb-next hidden" id="lbNext" onclick="lbGo(1, event)"  aria-label="Next">&#8594;</button>
+  </div>
+
+  <div class="lb-dots" id="lbDots"></div>
+
+  <div class="lb-info">
+    <div class="lightbox-title" id="lightboxTitle"></div>
+    <div class="lightbox-cat"   id="lightboxCat"></div>
+  </div>
+
+</div>
+
 
 
 
@@ -618,15 +652,7 @@
   <span>Manjeri, Kerala · India</span>
 </footer>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-  <button class="lightbox-close" onclick="closeLightbox()">✕</button>
-  <img class="lightbox-img" id="lightboxImg" src="" alt="">
-  <div class="lightbox-info">
-    <div class="lightbox-title" id="lightboxTitle"></div>
-    <div class="lightbox-cat" id="lightboxCat"></div>
-  </div>
-</div>
+
 
 <script>
 // --- SCROLL INDICATOR
@@ -693,66 +719,259 @@ window.onscroll = function () {
 
 
   
-  // --- PORTFOLIO BUTTON TO SWITCH BETWEEN GRAPHIC DESIGNING AND WEBSITE PR ---
-  function switchTab(tab, btn) {
-    // Update pills
-    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+  // --- PORTFOLIO ----
   
-    // Show correct panel
-    document.getElementById('panel-design').style.display = tab === 'design' ? 'block' : 'none';
-    document.getElementById('panel-web').style.display   = tab === 'web'    ? 'block' : 'none';
-  }
-  
-  // ── SHOW ALL / COLLAPSE ──
-  let showingAll = false;
-  function toggleShowAll() {
-    showingAll = !showingAll;
-    const extra       = document.getElementById('extraGrid');
-    const showAllRow  = document.getElementById('showAllBtn').parentElement;
-    const collapseRow = document.getElementById('collapseRow');
-    if (showingAll) {
-      extra.classList.add('open');
-      showAllRow.style.display  = 'none';
-      collapseRow.style.display = 'flex';
-    } else {
-      extra.classList.remove('open');
-      showAllRow.style.display  = 'flex';
-      collapseRow.style.display = 'none';
-      document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
-    }
-  }
+  function initCarousels() {
+  document.querySelectorAll('.work-item[data-images]').forEach(item => {
+    let images;
+    try { images = JSON.parse(item.dataset.images); } catch(e) { return; }
+    if (!images || images.length < 2) return;
 
-  // Show the "Show All" button only if the extra grid has children
-  window.addEventListener('DOMContentLoaded', () => {
-    const extra = document.getElementById('extraGrid');
-    const btn   = document.getElementById('showAllBtn');
-    if (extra && extra.children.length > 0) {
-      btn.style.display = 'inline-block';
+    // Remove the static <img> — we replace it with a slide track
+    const staticImg = item.querySelector(':scope > img');
+    if (staticImg) staticImg.remove();
+
+    // Build slides wrapper
+    const track = document.createElement('div');
+    track.className = 'thumb-slides';
+    images.forEach(src => {
+      const slide = document.createElement('div');
+      slide.className = 'thumb-slide';
+      const img = document.createElement('img');
+      img.src = src; img.alt = '';
+      slide.appendChild(img);
+      track.appendChild(slide);
+    });
+    item.insertBefore(track, item.firstChild);
+
+    // Dots overlay
+    const dotsEl = document.createElement('div');
+    dotsEl.className = 'thumb-dots';
+    images.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'thumb-dot' + (i === 0 ? ' active' : '');
+      dotsEl.appendChild(d);
+    });
+    item.appendChild(dotsEl);
+
+    // Badge (Instagram stacked squares)
+    const badge = document.createElement('div');
+    badge.className = 'carousel-badge';
+    badge.innerHTML = `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="7" width="13" height="13" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/>
+        <path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span>${images.length}</span>`;
+    item.appendChild(badge);
+
+    // Prev / Next arrows on thumbnail
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'thumb-arrow prev';
+    prevBtn.innerHTML = '&#8592;';
+    prevBtn.setAttribute('aria-label', 'Previous image');
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'thumb-arrow next';
+    nextBtn.innerHTML = '&#8594;';
+    nextBtn.setAttribute('aria-label', 'Next image');
+
+    item.appendChild(prevBtn);
+    item.appendChild(nextBtn);
+
+    // State
+    let current = 0;
+    const dots = dotsEl.querySelectorAll('.thumb-dot');
+
+    function goTo(idx) {
+      current = (idx + images.length) % images.length;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
     }
+
+    prevBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current - 1); });
+    nextBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
+
+    // Touch swipe on thumbnail
+    let tsX = null;
+    item.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; }, { passive: true });
+    item.addEventListener('touchend', e => {
+      if (tsX === null) return;
+      const dx = e.changedTouches[0].clientX - tsX;
+      if (Math.abs(dx) > 30) goTo(current + (dx < 0 ? 1 : -1));
+      tsX = null;
+    });
+
+    // Store current slide index on item so lightbox opens at same slide
+    item._carouselIndex = () => current;
+  });
+}
+
+/* ─────────────────────────────────────────
+   LIGHTBOX
+───────────────────────────────────────── */
+let lbImages  = [];
+let lbIndex   = 0;
+let lbDragX   = null;
+
+function openLightbox(el) {
+  // Collect images: data-images array OR single src
+  let images = [];
+  if (el.dataset.images) {
+    try { images = JSON.parse(el.dataset.images); } catch(e) {}
+  }
+  if (!images.length) {
+    const img = el.querySelector('img');
+    if (img) images = [img.src];
+  }
+  if (!images.length) return;
+
+  lbImages = images;
+  // Start at the thumbnail's current carousel slide (if any)
+  lbIndex = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
+
+  const title = el.dataset.title || '';
+  const cat   = el.dataset.cat   || '';
+
+  document.getElementById('lightboxTitle').textContent = title;
+  document.getElementById('lightboxCat').textContent   = cat;
+
+  buildLbSlides();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function buildLbSlides() {
+  const track = document.getElementById('lbTrack');
+  track.innerHTML = '';
+  lbImages.forEach((src, i) => {
+    const slide = document.createElement('div');
+    slide.className = 'lb-slide';
+    const img = document.createElement('img');
+    img.src = src; img.alt = '';
+    img.draggable = false;
+    slide.appendChild(img);
+    track.appendChild(slide);
   });
 
- 
- 
-  // ── LIGHTBOX ──
-  function openLightbox(el) {
-    const img   = el.querySelector('img');
-    const title = el.dataset.title || '';
-    const cat   = el.dataset.cat   || '';
-    document.getElementById('lightboxImg').src   = img ? img.src : '';
-    document.getElementById('lightboxTitle').textContent = title;
-    document.getElementById('lightboxCat').textContent   = cat;
-    document.getElementById('lightbox').classList.add('open');
+  // Dots
+  const dotsEl = document.getElementById('lbDots');
+  dotsEl.innerHTML = '';
+  if (lbImages.length > 1) {
+    lbImages.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'lb-dot';
+      d.setAttribute('aria-label', `Image ${i + 1}`);
+      d.addEventListener('click', e => { e.stopPropagation(); lbSetIndex(i); });
+      dotsEl.appendChild(d);
+    });
   }
-  function closeLightbox(e) {
-    if (!e || e.target === document.getElementById('lightbox') || e.target.classList.contains('lightbox-close')) {
-      document.getElementById('lightbox').classList.remove('open');
-    }
-  }
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
-  });
 
+  lbSetIndex(lbIndex, false); // no animation on open
+}
+
+function lbSetIndex(idx, animate = true) {
+  lbIndex = Math.max(0, Math.min(idx, lbImages.length - 1));
+  const track = document.getElementById('lbTrack');
+  track.style.transition = animate ? 'transform 0.4s cubic-bezier(.4,0,.2,1)' : 'none';
+  track.style.transform  = `translateX(-${lbIndex * 100}%)`;
+
+  // Counter
+  const counter = document.getElementById('lbCounter');
+  counter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
+  counter.classList.toggle('single', lbImages.length <= 1);
+
+  // Dots
+  document.querySelectorAll('#lbDots .lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbIndex));
+
+  // Arrows
+  const prevBtn = document.getElementById('lbPrev');
+  const nextBtn = document.getElementById('lbNext');
+  if (lbImages.length > 1) {
+    prevBtn.classList.remove('hidden');
+    nextBtn.classList.remove('hidden');
+    prevBtn.classList.toggle('hidden', lbIndex === 0);
+    nextBtn.classList.toggle('hidden', lbIndex === lbImages.length - 1);
+  } else {
+    prevBtn.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+  }
+}
+
+function lbGo(dir, e) {
+  if (e) e.stopPropagation();
+  lbSetIndex(lbIndex + dir);
+}
+
+function closeLightbox(e) {
+  if (!e
+      || e.target === document.getElementById('lightbox')
+      || e.target.classList.contains('lightbox-close')) {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'Escape')      closeLightbox();
+  if (e.key === 'ArrowLeft')   lbSetIndex(lbIndex - 1);
+  if (e.key === 'ArrowRight')  lbSetIndex(lbIndex + 1);
+});
+
+// Touch swipe in lightbox
+const lbStage = document.getElementById('lbStage');
+lbStage.addEventListener('touchstart', e => { lbDragX = e.touches[0].clientX; }, { passive: true });
+lbStage.addEventListener('touchend', e => {
+  if (lbDragX === null) return;
+  const dx = e.changedTouches[0].clientX - lbDragX;
+  if (Math.abs(dx) > 40) lbSetIndex(lbIndex + (dx < 0 ? 1 : -1));
+  lbDragX = null;
+});
+
+/* ─────────────────────────────────────────
+   TAB SWITCHER
+───────────────────────────────────────── */
+function switchTab(tab, btn) {
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-design').style.display = tab === 'design' ? 'block' : 'none';
+  document.getElementById('panel-web').style.display    = tab === 'web'    ? 'block' : 'none';
+}
+
+/* ─────────────────────────────────────────
+   SHOW ALL / COLLAPSE
+───────────────────────────────────────── */
+let showingAll = false;
+function toggleShowAll() {
+  showingAll = !showingAll;
+  const extra       = document.getElementById('extraGrid');
+  const showAllRow  = document.getElementById('showAllBtn').parentElement;
+  const collapseRow = document.getElementById('collapseRow');
+  if (showingAll) {
+    extra.classList.add('open');
+    showAllRow.style.display  = 'none';
+    collapseRow.style.display = 'flex';
+  } else {
+    extra.classList.remove('open');
+    showAllRow.style.display  = 'flex';
+    collapseRow.style.display = 'none';
+    document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+  }
+}
+
+/* ─────────────────────────────────────────
+   INIT
+───────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  initCarousels();
+
+  // Hide Show All btn if extra grid is empty
+  const extra = document.getElementById('extraGrid');
+  const btn   = document.getElementById('showAllBtn');
+  if (extra && extra.children.length === 0 && btn) btn.style.display = 'none';
+});
 
 
   // ── CONTACT FORM ──
