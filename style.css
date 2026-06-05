@@ -790,10 +790,17 @@
 /* ── CAROUSEL DOTS on thumbnail ── */
 .thumb-dots {
   position: absolute;
-  bottom: 0.55rem; left: 50%; transform: translateX(-50%);
+  bottom: 0.97rem; left: 50%; 
+  transition: transform 0.3s cubic-bezier(.25,.8,.25,1);
+  transform: translateX(-50%);
   display: flex; gap: 4px;
   pointer-events: none; z-index: 3;
 }
+
+.work-item:hover .thumb-dots{
+  transform: translateX(6.5rem) translateY(0);
+}
+*/
 .thumb-dot {
   width: 5px; height: 5px;
   border-radius: 50%;
@@ -823,23 +830,7 @@
 }
 .work-item:hover .thumb-slides .thumb-slide img { transform: scale(1.07); }
 
-/* Prev/Next arrows on thumbnail hover */
-.thumb-arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 28px; height: 28px;
-  background: rgba(13,13,13,0.55);
-  backdrop-filter: blur(4px);
-  border: none; border-radius: 50%;
-  color: #fff; font-size: 0.75rem;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer; z-index: 4;
-  opacity: 0; transition: opacity 0.22s ease, background 0.2s;
-  line-height: 1;
-}
-.work-item:hover .thumb-arrow { opacity: 1; }
-.thumb-arrow:hover { background: rgba(13,13,13,0.88); }
-.thumb-arrow.prev { left: 0.4rem; }
-.thumb-arrow.next { right: 0.4rem; }
+
 
 /* pdf badge */
 .pdf-badge {
