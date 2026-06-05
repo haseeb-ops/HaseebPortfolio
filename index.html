@@ -682,43 +682,6 @@ window.onscroll = function () {
   }
 
 
-// IMAGE LOADING EFFECT -----
-(function () {
-  document.querySelectorAll('img').forEach(function (img) {
-
-    // Skip tiny icons / SVGs
-    if (img.getAttribute('width') < 60 || img.getAttribute('height') < 60) return;
-    var rect = img.getBoundingClientRect();
-    if (rect.width > 0 && rect.width < 60) return;
-
-    var parent = img.parentNode;
-
-    // Don't double-wrap
-    if (parent.classList.contains('img-loader-wrap')) return;
-
-    var wrap = document.createElement('div');
-    wrap.className = 'img-loader-wrap';
-    parent.insertBefore(wrap, img);
-    wrap.appendChild(img);
-
-    // Scanline element
-    var scan = document.createElement('div');
-    scan.className = 'img-scan-line';
-    wrap.appendChild(scan);
-
-    function reveal() {
-      wrap.classList.add('loaded');
-    }
-
-    if (img.complete && img.naturalWidth > 0) {
-      requestAnimationFrame(reveal);
-    } else {
-      img.addEventListener('load',  reveal);
-      img.addEventListener('error', reveal);
-    }
-  });
-})();
-
 
   
   // --- PORTFOLIO ----
