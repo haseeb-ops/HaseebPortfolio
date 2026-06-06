@@ -684,19 +684,57 @@ window.onscroll = function () {
 
 
   
-  // --- PORTFOLIO ----
+// --- PORTFOLIO ----
   
-  function initCarousels() {
+function createSkeleton() {
+  const sk = document.createElement('div');
+  sk.className = 'img-skeleton';
+  for (let p = 0; p < 48; p++) {
+    const tile = document.createElement('div');
+    tile.className = 'pixel-tile';
+    sk.appendChild(tile);
+  }
+  return sk;
+}
+
+function revealSkeleton(sk) {
+  const tiles = sk.querySelectorAll('.pixel-tile');
+  const order = Array.from(tiles).sort(() => Math.random() - 0.5);
+  order.forEach((tile, idx) => {
+    tile.style.transitionDelay = (idx * 14) + 'ms';
+  });
+  sk.classList.add('done');
+}
+
+function initSkeletons() {
+  document.querySelectorAll('.work-item > img').forEach(img => {
+    const item = img.closest('.work-item');
+    item.querySelector('.img-skeleton')?.remove();
+    const sk = createSkeleton();
+    item.insertBefore(sk, item.firstChild);
+
+    function reveal() {
+      img.classList.add('loaded');
+      revealSkeleton(sk);
+    }
+    if (img.complete && img.naturalWidth > 0) {
+      reveal();
+    } else {
+      img.addEventListener('load',  reveal, { once: true });
+      img.addEventListener('error', reveal, { once: true });
+    }
+  });
+}
+
+function initCarousels() {
   document.querySelectorAll('.work-item[data-images]').forEach(item => {
     let images;
     try { images = JSON.parse(item.dataset.images); } catch(e) { return; }
     if (!images || images.length < 2) return;
 
-    // Remove the static <img> — we replace it with a slide track
     const staticImg = item.querySelector(':scope > img');
     if (staticImg) staticImg.remove();
 
-    // Build slides wrapper
     const track = document.createElement('div');
     track.className = 'thumb-slides';
     images.forEach(src => {
@@ -704,22 +742,35 @@ window.onscroll = function () {
       slide.className = 'thumb-slide';
       const img = document.createElement('img');
       img.src = src; img.alt = '';
+
+      const sk = createSkeleton();
+
+      function revealSlide() {
+        img.classList.add('loaded');
+        revealSkeleton(sk);
+      }
+      if (img.complete && img.naturalWidth > 0) {
+        revealSlide();
+      } else {
+        img.addEventListener('load',  revealSlide, { once: true });
+        img.addEventListener('error', revealSlide, { once: true });
+      }
+
+      slide.appendChild(sk);
       slide.appendChild(img);
       track.appendChild(slide);
     });
     item.insertBefore(track, item.firstChild);
-    
-    // Auto-slide (desktop only)
+
+    let current = 0;
     if (window.matchMedia('(min-width: 768px)').matches) {
       let autoSlide = setInterval(() => goTo(current + 1), 3000);
-    
       item.addEventListener('mouseenter', () => clearInterval(autoSlide));
       item.addEventListener('mouseleave', () => {
         autoSlide = setInterval(() => goTo(current + 1), 3000);
       });
     }
 
-    // Dots overlay
     const dotsEl = document.createElement('div');
     dotsEl.className = 'thumb-dots';
     images.forEach((_, i) => {
@@ -729,7 +780,6 @@ window.onscroll = function () {
     });
     item.appendChild(dotsEl);
 
-    // Badge (Instagram stacked squares)
     const badge = document.createElement('div');
     badge.className = 'carousel-badge';
     badge.innerHTML = `
@@ -740,19 +790,13 @@ window.onscroll = function () {
       <span>${images.length}</span>`;
     item.appendChild(badge);
 
-    // Prev / Next arrows on thumbnail
     const prevBtn = document.createElement('button');
-    
     prevBtn.setAttribute('aria-label', 'Previous image');
-
     const nextBtn = document.createElement('button');
     nextBtn.setAttribute('aria-label', 'Next image');
-
     item.appendChild(prevBtn);
     item.appendChild(nextBtn);
 
-    // State
-    let current = 0;
     const dots = dotsEl.querySelectorAll('.thumb-dot');
 
     function goTo(idx) {
@@ -764,7 +808,6 @@ window.onscroll = function () {
     prevBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current - 1); });
     nextBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
 
-    // Touch swipe on thumbnail
     let tsX = null;
     item.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; }, { passive: true });
     item.addEventListener('touchend', e => {
@@ -774,7 +817,6 @@ window.onscroll = function () {
       tsX = null;
     });
 
-    // Store current slide index on item so lightbox opens at same slide
     item._carouselIndex = () => current;
   });
 }
@@ -787,7 +829,6 @@ let lbIndex   = 0;
 let lbDragX   = null;
 
 function openLightbox(el) {
-  // Collect images: data-images array OR single src
   let images = [];
   if (el.dataset.images) {
     try { images = JSON.parse(el.dataset.images); } catch(e) {}
@@ -799,14 +840,10 @@ function openLightbox(el) {
   if (!images.length) return;
 
   lbImages = images;
-  // Start at the thumbnail's current carousel slide (if any)
   lbIndex = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
 
-  const title = el.dataset.title || '';
-  const cat   = el.dataset.cat   || '';
-
-  document.getElementById('lightboxTitle').textContent = title;
-  document.getElementById('lightboxCat').textContent   = cat;
+  document.getElementById('lightboxTitle').textContent = el.dataset.title || '';
+  document.getElementById('lightboxCat').textContent   = el.dataset.cat   || '';
 
   buildLbSlides();
   document.getElementById('lightbox').classList.add('open');
@@ -816,7 +853,7 @@ function openLightbox(el) {
 function buildLbSlides() {
   const track = document.getElementById('lbTrack');
   track.innerHTML = '';
-  lbImages.forEach((src, i) => {
+  lbImages.forEach((src) => {
     const slide = document.createElement('div');
     slide.className = 'lb-slide';
     const img = document.createElement('img');
@@ -826,7 +863,6 @@ function buildLbSlides() {
     track.appendChild(slide);
   });
 
-  // Dots
   const dotsEl = document.getElementById('lbDots');
   dotsEl.innerHTML = '';
   if (lbImages.length > 1) {
@@ -839,7 +875,7 @@ function buildLbSlides() {
     });
   }
 
-  lbSetIndex(lbIndex, false); // no animation on open
+  lbSetIndex(lbIndex, false);
 }
 
 function lbSetIndex(idx, animate = true) {
@@ -848,15 +884,12 @@ function lbSetIndex(idx, animate = true) {
   track.style.transition = animate ? 'transform 0.4s cubic-bezier(.4,0,.2,1)' : 'none';
   track.style.transform  = `translateX(-${lbIndex * 100}%)`;
 
-  // Counter
   const counter = document.getElementById('lbCounter');
   counter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
   counter.classList.toggle('single', lbImages.length <= 1);
 
-  // Dots
   document.querySelectorAll('#lbDots .lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbIndex));
 
-  // Arrows
   const prevBtn = document.getElementById('lbPrev');
   const nextBtn = document.getElementById('lbNext');
   if (lbImages.length > 1) {
@@ -884,7 +917,6 @@ function closeLightbox(e) {
   }
 }
 
-// Keyboard
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('open')) return;
   if (e.key === 'Escape')      closeLightbox();
@@ -892,7 +924,6 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight')  lbSetIndex(lbIndex + 1);
 });
 
-// Touch swipe in lightbox
 const lbStage = document.getElementById('lbStage');
 lbStage.addEventListener('touchstart', e => { lbDragX = e.touches[0].clientX; }, { passive: true });
 lbStage.addEventListener('touchend', e => {
@@ -938,8 +969,8 @@ function toggleShowAll() {
 ───────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', () => {
   initCarousels();
+  initSkeletons();
 
-  // Hide Show All btn if extra grid is empty
   const extra = document.getElementById('extraGrid');
   const btn   = document.getElementById('showAllBtn');
   if (extra && extra.children.length === 0 && btn) btn.style.display = 'none';

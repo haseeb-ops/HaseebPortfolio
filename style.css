@@ -1393,3 +1393,29 @@
 
 
 
+/* ── PIXEL DISSOLVE SKELETON ── */
+.img-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: inherit;
+  pointer-events: none;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(6, 1fr);
+  gap: 0;
+}
+.img-skeleton .pixel-tile {
+  background: #e2dbd0;
+  transition: opacity 0.35s ease;
+}
+.img-skeleton .pixel-tile:nth-child(odd) { background: #ddd6cb; }
+.img-skeleton.done .pixel-tile { opacity: 0; }
+
+.work-item > img,
+.thumb-slide img {
+  opacity: 0;
+  transition: opacity 0.45s ease, transform 0.55s cubic-bezier(.25,.8,.25,1);
+}
+.work-item > img.loaded,
+.thumb-slide img.loaded { opacity: 1; }
