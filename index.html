@@ -689,20 +689,15 @@ window.onscroll = function () {
 function createSkeleton() {
   const sk = document.createElement('div');
   sk.className = 'img-skeleton';
-  for (let p = 0; p < 48; p++) {
-    const tile = document.createElement('div');
-    tile.className = 'pixel-tile';
-    sk.appendChild(tile);
+  for (let d = 0; d < 3; d++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    sk.appendChild(dot);
   }
   return sk;
 }
 
 function revealSkeleton(sk) {
-  const tiles = sk.querySelectorAll('.pixel-tile');
-  const order = Array.from(tiles).sort(() => Math.random() - 0.5);
-  order.forEach((tile, idx) => {
-    tile.style.transitionDelay = (idx * 14) + 'ms';
-  });
   sk.classList.add('done');
 }
 
@@ -824,9 +819,9 @@ function initCarousels() {
 /* ─────────────────────────────────────────
    LIGHTBOX
 ───────────────────────────────────────── */
-let lbImages  = [];
-let lbIndex   = 0;
-let lbDragX   = null;
+let lbImages = [];
+let lbIndex  = 0;
+let lbDragX  = null;
 
 function openLightbox(el) {
   let images = [];
@@ -840,7 +835,7 @@ function openLightbox(el) {
   if (!images.length) return;
 
   lbImages = images;
-  lbIndex = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
+  lbIndex  = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
 
   document.getElementById('lightboxTitle').textContent = el.dataset.title || '';
   document.getElementById('lightboxCat').textContent   = el.dataset.cat   || '';
@@ -853,7 +848,7 @@ function openLightbox(el) {
 function buildLbSlides() {
   const track = document.getElementById('lbTrack');
   track.innerHTML = '';
-  lbImages.forEach((src) => {
+  lbImages.forEach(src => {
     const slide = document.createElement('div');
     slide.className = 'lb-slide';
     const img = document.createElement('img');
@@ -919,9 +914,9 @@ function closeLightbox(e) {
 
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('open')) return;
-  if (e.key === 'Escape')      closeLightbox();
-  if (e.key === 'ArrowLeft')   lbSetIndex(lbIndex - 1);
-  if (e.key === 'ArrowRight')  lbSetIndex(lbIndex + 1);
+  if (e.key === 'Escape')     closeLightbox();
+  if (e.key === 'ArrowLeft')  lbSetIndex(lbIndex - 1);
+  if (e.key === 'ArrowRight') lbSetIndex(lbIndex + 1);
 });
 
 const lbStage = document.getElementById('lbStage');
