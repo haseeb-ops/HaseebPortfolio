@@ -686,31 +686,6 @@ if (window.matchMedia('(pointer: fine)').matches) {
   });
 }
 
-/* ─── SKELETON HELPERS ───────────────────────────── */
-function createSkeleton() {
-  const sk = document.createElement('div');
-  sk.className = 'img-skeleton';
-  for (let d = 0; d < 3; d++) {
-    const dot = document.createElement('div');
-    dot.className = 'dot';
-    sk.appendChild(dot);
-  }
-  return sk;
-}
-function revealSkeleton(sk) { sk.classList.add('done'); }
-
-function initSkeletons() {
-  document.querySelectorAll('.work-item > img').forEach(img => {
-    const item = img.closest('.work-item');
-    item.querySelector('.img-skeleton')?.remove();
-    const sk = createSkeleton();
-    item.insertBefore(sk, item.firstChild);
-    const reveal = () => { img.classList.add('loaded'); revealSkeleton(sk); };
-    (img.complete && img.naturalWidth > 0) ? reveal()
-      : img.addEventListener('load',  reveal, { once: true })
-      || img.addEventListener('error', reveal, { once: true });
-  });
-}
 
 /* ─── CAROUSELS ──────────────────────────────────── */
 function initCarousels() {
