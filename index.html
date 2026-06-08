@@ -927,7 +927,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   /* service cards with stagger */
   document.querySelectorAll('.service-card').forEach((el, i) => {
-    el.style.cssText += `opacity:0;transform:translateY(18px);
+    el.style.cssText += `opacity:0;transform:translateY(0px);
       transition:opacity .55s ease,transform .55s ease;
       ${window.innerWidth > 768 ? `transition-delay:${0.45 + i * 0.1}s` : ''}`;
     revealObs.observe(el);
