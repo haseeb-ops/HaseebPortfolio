@@ -687,6 +687,7 @@ if (window.matchMedia('(pointer: fine)').matches) {
 }
 
 
+
 /* ─── CAROUSELS ──────────────────────────────────── */
 function initCarousels() {
   document.querySelectorAll('.work-item[data-images]').forEach(item => {
@@ -890,7 +891,7 @@ window.addEventListener('DOMContentLoaded', () => {
       if (!entry.isIntersecting) return;
       entry.target.classList.add('show');           // for .exp-item
       entry.target.style.opacity   = '1';           // for others
-      entry.target.style.transform = 'translateY(0)';
+      entry.target.style.transform = 'translateY(18px)';
       if (window.innerWidth > 768 && entry.target.classList.contains('service-card')) {
         setTimeout(() => { entry.target.style.transitionDelay = '0s'; }, 800);
       }
@@ -902,7 +903,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   /* service cards with stagger */
   document.querySelectorAll('.service-card').forEach((el, i) => {
-    el.style.cssText += `opacity:0;transform:translateY(0px);
+    el.style.cssText += `opacity:0;transform:translateY(18px);
       transition:opacity .55s ease,transform .55s ease;
       ${window.innerWidth > 768 ? `transition-delay:${0.45 + i * 0.1}s` : ''}`;
     revealObs.observe(el);
