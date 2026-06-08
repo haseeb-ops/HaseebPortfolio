@@ -667,26 +667,37 @@
 
 
 <script>
-/* ─── SCROLL BAR ─────────────────────────────────── */
-window.addEventListener('scroll', () => {
-  const el = document.documentElement;
-  document.getElementById('scrollBar').style.width =
-    (el.scrollTop / (el.scrollHeight - el.clientHeight) * 100) + '%';
-});
+// --- SCROLL INDICATOR
+window.onscroll = function () {
+  let scrollTop = document.documentElement.scrollTop;
+  let scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  let scrolled = (scrollTop / scrollHeight) * 100;
 
-/* ─── CUSTOM CURSOR (desktop only) ──────────────── */
-if (window.matchMedia('(pointer: fine)').matches) {
-  const cur  = document.getElementById('cursor');
-  const ring = document.getElementById('cursorRing');
-  document.addEventListener('mousemove', e => {
-    cur.style.cssText  = `left:${e.clientX}px;top:${e.clientY}px`;
-    setTimeout(() => {
-      ring.style.cssText = `left:${e.clientX}px;top:${e.clientY}px`;
-    }, 60);
-  });
-}
+  document.getElementById("scrollBar").style.width = scrolled + "%";
+};
 
-/* ─── SKELETON HELPERS ───────────────────────────── */
+
+
+
+  // ── CUSTOM CURSOR — desktop (fine pointer) only ──
+  if (window.matchMedia('(pointer: fine)').matches) {
+    const cur = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    document.addEventListener('mousemove', e => {
+      cur.style.left = e.clientX + 'px';
+      cur.style.top  = e.clientY + 'px';
+      setTimeout(() => {
+        ring.style.left = e.clientX + 'px';
+        ring.style.top  = e.clientY + 'px';
+      }, 60);
+    });
+  }
+
+
+
+  
+// --- PORTFOLIO ----
+  
 function createSkeleton() {
   const sk = document.createElement('div');
   sk.className = 'img-skeleton';
@@ -697,7 +708,10 @@ function createSkeleton() {
   }
   return sk;
 }
-function revealSkeleton(sk) { sk.classList.add('done'); }
+
+function revealSkeleton(sk) {
+  sk.classList.add('done');
+}
 
 function initSkeletons() {
   document.querySelectorAll('.work-item > img').forEach(img => {
@@ -705,41 +719,65 @@ function initSkeletons() {
     item.querySelector('.img-skeleton')?.remove();
     const sk = createSkeleton();
     item.insertBefore(sk, item.firstChild);
-    const reveal = () => { img.classList.add('loaded'); revealSkeleton(sk); };
-    (img.complete && img.naturalWidth > 0) ? reveal()
-      : img.addEventListener('load',  reveal, { once: true })
-      || img.addEventListener('error', reveal, { once: true });
+
+    function reveal() {
+      img.classList.add('loaded');
+      revealSkeleton(sk);
+    }
+    if (img.complete && img.naturalWidth > 0) {
+      reveal();
+    } else {
+      img.addEventListener('load',  reveal, { once: true });
+      img.addEventListener('error', reveal, { once: true });
+    }
   });
 }
 
-/* ─── CAROUSELS ──────────────────────────────────── */
 function initCarousels() {
   document.querySelectorAll('.work-item[data-images]').forEach(item => {
     let images;
     try { images = JSON.parse(item.dataset.images); } catch(e) { return; }
     if (!images || images.length < 2) return;
 
-    item.querySelector(':scope > img')?.remove();
+    const staticImg = item.querySelector(':scope > img');
+    if (staticImg) staticImg.remove();
 
     const track = document.createElement('div');
     track.className = 'thumb-slides';
-
     images.forEach(src => {
       const slide = document.createElement('div');
       slide.className = 'thumb-slide';
       const img = document.createElement('img');
       img.src = src; img.alt = '';
+
       const sk = createSkeleton();
-      const revealSlide = () => { img.classList.add('loaded'); revealSkeleton(sk); };
-      (img.complete && img.naturalWidth > 0) ? revealSlide()
-        : img.addEventListener('load',  revealSlide, { once: true })
-        || img.addEventListener('error', revealSlide, { once: true });
-      slide.append(sk, img);
+
+      function revealSlide() {
+        img.classList.add('loaded');
+        revealSkeleton(sk);
+      }
+      if (img.complete && img.naturalWidth > 0) {
+        revealSlide();
+      } else {
+        img.addEventListener('load',  revealSlide, { once: true });
+        img.addEventListener('error', revealSlide, { once: true });
+      }
+
+      slide.appendChild(sk);
+      slide.appendChild(img);
       track.appendChild(slide);
     });
     item.insertBefore(track, item.firstChild);
 
-    /* dots */
+    let current = 0;
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      let autoSlide = setInterval(() => goTo(current + 1), 3000);
+      item.addEventListener('mouseenter', () => clearInterval(autoSlide));
+      item.addEventListener('mouseleave', () => {
+        autoSlide = setInterval(() => goTo(current + 1), 3000);
+      });
+    }
+
     const dotsEl = document.createElement('div');
     dotsEl.className = 'thumb-dots';
     images.forEach((_, i) => {
@@ -748,49 +786,38 @@ function initCarousels() {
       dotsEl.appendChild(d);
     });
     item.appendChild(dotsEl);
-    const dots = dotsEl.querySelectorAll('.thumb-dot');
 
-    /* badge */
     const badge = document.createElement('div');
     badge.className = 'carousel-badge';
-    badge.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <rect x="2" y="7" width="13" height="13" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/>
-      <path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"
-            fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
-    </svg><span>${images.length}</span>`;
+    badge.innerHTML = `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="7" width="13" height="13" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/>
+        <path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      <span>${images.length}</span>`;
     item.appendChild(badge);
 
-    /* nav buttons */
     const prevBtn = document.createElement('button');
     prevBtn.setAttribute('aria-label', 'Previous image');
     const nextBtn = document.createElement('button');
     nextBtn.setAttribute('aria-label', 'Next image');
-    item.append(prevBtn, nextBtn);
+    item.appendChild(prevBtn);
+    item.appendChild(nextBtn);
 
-    let current = 0;
+    const dots = dotsEl.querySelectorAll('.thumb-dot');
+
     function goTo(idx) {
       current = (idx + images.length) % images.length;
       track.style.transform = `translateX(-${current * 100}%)`;
       dots.forEach((d, i) => d.classList.toggle('active', i === current));
     }
 
-    /* auto-slide — desktop only, cleaned up properly */
-    let autoSlide;
-    if (window.matchMedia('(min-width: 768px)').matches) {
-      autoSlide = setInterval(() => goTo(current + 1), 3000);
-      item.addEventListener('mouseenter', () => clearInterval(autoSlide));
-      item.addEventListener('mouseleave', () => {
-        autoSlide = setInterval(() => goTo(current + 1), 3000);
-      });
-    }
-
     prevBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current - 1); });
     nextBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
 
-    /* touch swipe */
     let tsX = null;
     item.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; }, { passive: true });
-    item.addEventListener('touchend',   e => {
+    item.addEventListener('touchend', e => {
       if (tsX === null) return;
       const dx = e.changedTouches[0].clientX - tsX;
       if (Math.abs(dx) > 30) goTo(current + (dx < 0 ? 1 : -1));
@@ -801,17 +828,27 @@ function initCarousels() {
   });
 }
 
-/* ─── LIGHTBOX ───────────────────────────────────── */
-let lbImages = [], lbIndex = 0, lbDragX = null;
+/* ─────────────────────────────────────────
+   LIGHTBOX
+───────────────────────────────────────── */
+let lbImages = [];
+let lbIndex  = 0;
+let lbDragX  = null;
 
 function openLightbox(el) {
   let images = [];
-  if (el.dataset.images) try { images = JSON.parse(el.dataset.images); } catch(e) {}
-  if (!images.length) { const img = el.querySelector('img'); if (img) images = [img.src]; }
+  if (el.dataset.images) {
+    try { images = JSON.parse(el.dataset.images); } catch(e) {}
+  }
+  if (!images.length) {
+    const img = el.querySelector('img');
+    if (img) images = [img.src];
+  }
   if (!images.length) return;
 
   lbImages = images;
   lbIndex  = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
+
   document.getElementById('lightboxTitle').textContent = el.dataset.title || '';
   document.getElementById('lightboxCat').textContent   = el.dataset.cat   || '';
 
@@ -827,7 +864,8 @@ function buildLbSlides() {
     const slide = document.createElement('div');
     slide.className = 'lb-slide';
     const img = document.createElement('img');
-    img.src = src; img.alt = ''; img.draggable = false;
+    img.src = src; img.alt = '';
+    img.draggable = false;
     slide.appendChild(img);
     track.appendChild(slide);
   });
@@ -843,6 +881,7 @@ function buildLbSlides() {
       dotsEl.appendChild(d);
     });
   }
+
   lbSetIndex(lbIndex, false);
 }
 
@@ -856,12 +895,19 @@ function lbSetIndex(idx, animate = true) {
   counter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
   counter.classList.toggle('single', lbImages.length <= 1);
 
-  document.querySelectorAll('#lbDots .lb-dot').forEach((d, i) =>
-    d.classList.toggle('active', i === lbIndex));
+  document.querySelectorAll('#lbDots .lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbIndex));
 
-  const isMulti = lbImages.length > 1;
-  document.getElementById('lbPrev').classList.toggle('hidden', !isMulti || lbIndex === 0);
-  document.getElementById('lbNext').classList.toggle('hidden', !isMulti || lbIndex === lbImages.length - 1);
+  const prevBtn = document.getElementById('lbPrev');
+  const nextBtn = document.getElementById('lbNext');
+  if (lbImages.length > 1) {
+    prevBtn.classList.remove('hidden');
+    nextBtn.classList.remove('hidden');
+    prevBtn.classList.toggle('hidden', lbIndex === 0);
+    nextBtn.classList.toggle('hidden', lbIndex === lbImages.length - 1);
+  } else {
+    prevBtn.classList.add('hidden');
+    nextBtn.classList.add('hidden');
+  }
 }
 
 function lbGo(dir, e) {
@@ -870,14 +916,14 @@ function lbGo(dir, e) {
 }
 
 function closeLightbox(e) {
-  if (!e || e.target === document.getElementById('lightbox')
-         || e.target.classList.contains('lightbox-close')) {
+  if (!e
+      || e.target === document.getElementById('lightbox')
+      || e.target.classList.contains('lightbox-close')) {
     document.getElementById('lightbox').classList.remove('open');
     document.body.style.overflow = '';
   }
 }
 
-/* ─── KEYBOARD + TOUCH (lightbox) ───────────────── */
 document.addEventListener('keydown', e => {
   if (!document.getElementById('lightbox').classList.contains('open')) return;
   if (e.key === 'Escape')     closeLightbox();
@@ -885,110 +931,18 @@ document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight') lbSetIndex(lbIndex + 1);
 });
 
-/* ─── ALL DOM-DEPENDENT CODE ─────────────────────── */
-window.addEventListener('DOMContentLoaded', () => {
-
-  /* Lightbox touch — safe inside DOMContentLoaded */
-  const lbStage = document.getElementById('lbStage');
-  if (lbStage) {
-    lbStage.addEventListener('touchstart', e => { lbDragX = e.touches[0].clientX; }, { passive: true });
-    lbStage.addEventListener('touchend',   e => {
-      if (lbDragX === null) return;
-      const dx = e.changedTouches[0].clientX - lbDragX;
-      if (Math.abs(dx) > 40) lbSetIndex(lbIndex + (dx < 0 ? 1 : -1));
-      lbDragX = null;
-    });
-  }
-
-  /* Carousels & skeletons */
-  initCarousels();
-  initSkeletons();
-
-  /* Hide show-all btn if extra grid is empty */
-  const extra = document.getElementById('extraGrid');
-  const btn   = document.getElementById('showAllBtn');
-  if (extra && extra.children.length === 0 && btn) btn.style.display = 'none';
-
-  /* ── SINGLE unified scroll-reveal observer ── */
-  const revealObs = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add('show');           // for .exp-item
-      entry.target.style.opacity   = '1';           // for others
-      entry.target.style.transform = 'translateY(18px)';
-      if (window.innerWidth > 768 && entry.target.classList.contains('service-card')) {
-        setTimeout(() => { entry.target.style.transitionDelay = '0s'; }, 800);
-      }
-    });
-  }, { threshold: 0.2 });
-
-  /* exp-items */
-  document.querySelectorAll('.exp-item').forEach(el => revealObs.observe(el));
-
-  /* service cards with stagger */
-  document.querySelectorAll('.service-card').forEach((el, i) => {
-    el.style.cssText += `opacity:0;transform:translateY(18px);
-      transition:opacity .55s ease,transform .55s ease;
-      ${window.innerWidth > 768 ? `transition-delay:${0.45 + i * 0.1}s` : ''}`;
-    revealObs.observe(el);
-  });
-
-  /* other reveal targets */
-  document.querySelectorAll(
-    '.contact-left,.to-up-btn,.contact-form,.work-item,.web-card'
-  ).forEach(el => {
-    el.style.cssText += 'opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease';
-    revealObs.observe(el);
-  });
-
-  /* ── CONTACT FORM ── */
-  const form   = document.getElementById('contactForm');
-  const cfBtn  = document.getElementById('cf-btn');
-  const status = document.getElementById('cf-status');
-  if (!form) return;
-
-  form.addEventListener('submit', async e => {
-    e.preventDefault();
-    if (!form.checkValidity()) { form.reportValidity(); return; }
-
-    cfBtn.disabled = true;
-    cfBtn.textContent = 'Sending…';
-    status.className = 'cf-status';
-    status.textContent = '';
-
-    try {
-      const res = await fetch(form.action, {
-        method: 'POST', body: new FormData(form),
-        headers: { Accept: 'application/json' }
-      });
-      if (res.ok) {
-        status.textContent = '✓ Message sent! I\'ll get back to you soon.';
-        status.className   = 'cf-status success';
-        form.reset();
-        cfBtn.textContent  = 'Message Sent ✓';
-        setTimeout(() => {
-          cfBtn.textContent = 'Send Message →';
-          cfBtn.disabled    = false;
-          status.className  = 'cf-status';
-          status.textContent = '';
-        }, 5000);
-      } else {
-        const json = await res.json().catch(() => ({}));
-        status.textContent = json.error || '✕ Something went wrong. Please try again.';
-        status.className   = 'cf-status error';
-        cfBtn.textContent  = 'Send Message →';
-        cfBtn.disabled     = false;
-      }
-    } catch (_) {
-      status.textContent = '✕ Network error. Check your connection and try again.';
-      status.className   = 'cf-status error';
-      cfBtn.textContent  = 'Send Message →';
-      cfBtn.disabled     = false;
-    }
-  });
+const lbStage = document.getElementById('lbStage');
+lbStage.addEventListener('touchstart', e => { lbDragX = e.touches[0].clientX; }, { passive: true });
+lbStage.addEventListener('touchend', e => {
+  if (lbDragX === null) return;
+  const dx = e.changedTouches[0].clientX - lbDragX;
+  if (Math.abs(dx) > 40) lbSetIndex(lbIndex + (dx < 0 ? 1 : -1));
+  lbDragX = null;
 });
 
-/* ─── TAB SWITCHER ───────────────────────────────── */
+/* ─────────────────────────────────────────
+   TAB SWITCHER
+───────────────────────────────────────── */
 function switchTab(tab, btn) {
   document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -996,7 +950,9 @@ function switchTab(tab, btn) {
   document.getElementById('panel-web').style.display    = tab === 'web'    ? 'block' : 'none';
 }
 
-/* ─── SHOW ALL / COLLAPSE ────────────────────────── */
+/* ─────────────────────────────────────────
+   SHOW ALL / COLLAPSE
+───────────────────────────────────────── */
 let showingAll = false;
 function toggleShowAll() {
   showingAll = !showingAll;
@@ -1014,6 +970,133 @@ function toggleShowAll() {
     document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
   }
 }
+
+/* ─────────────────────────────────────────
+   INIT
+───────────────────────────────────────── */
+window.addEventListener('DOMContentLoaded', () => {
+  initCarousels();
+  initSkeletons();
+
+  const extra = document.getElementById('extraGrid');
+  const btn   = document.getElementById('showAllBtn');
+  if (extra && extra.children.length === 0 && btn) btn.style.display = 'none';
+});
+
+
+  // ── CONTACT FORM ──
+  (function () {
+    const form   = document.getElementById('contactForm');
+    const btn    = document.getElementById('cf-btn');
+    const status = document.getElementById('cf-status');
+  
+    if (!form) return;
+  
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+  
+      // Basic HTML5 validation check
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+  
+      // UI: loading state
+      btn.disabled    = true;
+      btn.textContent = 'Sending…';
+      status.className = 'cf-status';
+      status.textContent = '';
+  
+      try {
+        const data = new FormData(form);
+        const res  = await fetch(form.action, {
+          method:  'POST',
+          body:    data,
+          headers: { Accept: 'application/json' }
+        });
+  
+        if (res.ok) {
+          // Success
+          status.textContent = '✓ Message sent! I\'ll get back to you soon.';
+          status.className   = 'cf-status success';
+          form.reset();
+          btn.textContent = 'Message Sent ✓';
+          setTimeout(() => {
+            btn.textContent = 'Send Message →';
+            btn.disabled    = false;
+            status.className = 'cf-status';
+            status.textContent = '';
+          }, 5000);
+        } else {
+          // Formspree returned an error
+          const json = await res.json().catch(() => ({}));
+          status.textContent = json.error || '✕ Something went wrong. Please try again.';
+          status.className   = 'cf-status error';
+          btn.textContent    = 'Send Message →';
+          btn.disabled       = false;
+        }
+      } catch (_) {
+        // Network error
+        status.textContent = '✕ Network error. Check your connection and try again.';
+        status.className   = 'cf-status error';
+        btn.textContent    = 'Send Message →';
+        btn.disabled       = false;
+      }
+    });
+  })();
+
+
+
+  // SCROLL REVEAL FOR EXPERIENCE ITEM ONLY
+  const elements = document.querySelectorAll('.exp-item');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('show');
+      }
+    });
+  }, {
+    threshold: 0.2 // trigger when 30% visible 
+    });
+
+  elements.forEach(el => observer.observe(el));
+  
+  
+  // ── SCROLL REVEAL ──
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        
+        if (window.innerWidth > 768 && entry.target.classList.contains('service-card')) {
+          setTimeout(() => {
+            entry.target.style.transitionDelay = '0s';
+          }, 800);
+        }
+      }
+    });
+  }, { threshold: 0.2 });
+  
+  document.querySelectorAll('.service-card').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+    
+    if (window.innerWidth > 768) {
+      el.style.transitionDelay = `${0.45 + i * 0.1}s`;
+    }
+    
+    obs.observe(el);
+  });
+  
+  document.querySelectorAll('.contact-left, .to-up-btn, .contact-form, .work-item, .web-card').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(18px)';
+    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
+    obs.observe(el);
+  });
 
 </script>
 </body>
