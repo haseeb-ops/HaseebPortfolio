@@ -810,16 +810,13 @@
 .thumb-dots {
   position: absolute;
   bottom: 0.97rem; left: 50%; 
-  transition: transform 0.3s cubic-bezier(.25,.8,.25,1);
   transform: translateX(-50%);
   display: flex; gap: 4px;
   pointer-events: none; z-index: 3;
+  
+  opacity: 1;
+  transition: opacity 0.15s ease;
 }
-
-.work-item:hover .thumb-dots{
-  transform: translateX(6.5rem) translateY(0);
-}
-*/
 .thumb-dot {
   width: 5px; height: 5px;
   border-radius: 50%;
@@ -830,7 +827,9 @@
   background: #fff;
   transform: scale(1.25);
 }
-
+.work-item:hover .thumb-dots {
+  opacity: 0;
+}
 /* ── THUMBNAIL CAROUSEL (swipeable slides) ── */
 .thumb-slides {
   position: absolute; inset: 0;
