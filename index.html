@@ -41,7 +41,7 @@
 
 <!-- TO UP BUTTON -->
 
-<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="to-up-btn">
+<button onclick="window.scrollTo({top: 0, behavior: 'smooth'})" class="to-up-btn reveal reveal-right">
   ↑
 </button>
 
@@ -170,7 +170,7 @@
     <p class="about-text" style="margin-top:1rem;">
     Since 2021, I’ve worked with clients, agencies, and businesses to transform ideas into powerful visual experiences. I combine creativity with data-driven thinking to deliver designs that are not just beautiful—but effective.
     </p>
-    <div class="skills-grid">
+    <div class="skills-grid reveal reveal-left">
       <span class="skill-chip">Photoshop</span>
       <span class="skill-chip">Illustrator</span>
       <span class="skill-chip">InDesign</span>
@@ -185,21 +185,25 @@
     </div>
   </div>
   <div class="about-right">
-    <div class="exp-item">
+    
+    <div class="exp-item reveal reveal-right">
       <div class="exp-role">Freelance Graphic Designer</div>
       <div class="exp-company">Instagram: magictool.creative.hub · 2021–2024</div>
       <div class="exp-desc">Delivered custom branding, social media posts, and marketing materials to clients across industries, enhancing their visual identity.</div>
     </div>
-    <div class="exp-item">
+    
+    <div class="exp-item reveal reveal-right">
       <div class="exp-role">Technical Manager cum Graphic Designer</div>
       <div class="exp-company">Riplex Marketing Agency · Jun–Nov 2023</div>
       <div class="exp-desc">Automated campaign reporting (50% manual work reduction) and designed Instagram creatives aligned with campaign goals.</div>
     </div>
-    <div class="exp-item">
+    
+    <div class="exp-item reveal reveal-right">
       <div class="exp-role">Stock Manager cum Cashier</div>
       <div class="exp-company">Pompano Seafood Restaurant · Jun–Nov 2024</div>
       <div class="exp-desc">Built a Google Sheet automating stock and expense calculations, improving operational efficiency by 20%.</div>
     </div>
+    
   </div>
 </section>
 
@@ -213,7 +217,7 @@
   </div>
 
   <!-- TAB SWITCHER -->
-  <div class="portfolio-tabs">
+  <div class="portfolio-tabs reveal reveal-up">
     <button class="ptab active" onclick="switchTab('design', this)">Graphic Design</button>
     <button class="ptab" onclick="switchTab('web', this)">Web Projects</button>
   </div>
@@ -235,7 +239,7 @@
 
       <!-- CAROUSEL EXAMPLE — Awareness Campaign (2 images) 
       
-      <div class="work-item"
+      <div class="work-item reveal reveal-up"
            data-cat="Awareness Campaign Poster"
            data-images='["images/OrvaEnvironmentalDay.jpg"
                           "images/OppamEarthDay.jpg"
@@ -248,32 +252,32 @@
       -->
 
       <!-- SINGLE IMAGE -->
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/BizireTask1.webp" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
       
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/BizireTask2.webp" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
       
-      <div class="work-item" data-cat="Awareness Campaign Poster" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Awareness Campaign Poster" onclick="openLightbox(this)">
         <img src="images/OrvaEnvironmentalDay.webp" alt="Awareness Campaign Poster">
         <div class="work-overlay"><div class="work-cat">Awareness Campaign Poster</div></div>
       </div>
       
-       <div class="work-item" data-cat="Awareness Campaign Poster" onclick="openLightbox(this)">
+       <div class="work-item reveal reveal-up" data-cat="Awareness Campaign Poster" onclick="openLightbox(this)">
         <img src="images/OppamEarthDay.webp" alt="Awareness Campaign Poster">
         <div class="work-overlay"><div class="work-cat">Awareness Campaign Poster</div></div>
       </div>
       
-      <div class="work-item" data-cat="Greeting Poster" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Greeting Poster" onclick="openLightbox(this)">
         <img src="images/OrvaBakreeth.webp" alt="Greeting Poster">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
       
-      <div class="work-item"
+      <div class="work-item reveal reveal-up"
            data-cat="Awareness Campaign Carousel"
            data-images='["images/OppamC1.webp",
                           "images/OppamC2.webp",
@@ -286,17 +290,17 @@
         <div class="work-overlay"><div class="work-cat">Awareness Campaign Carousel</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/OrvaPoster2.webp" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Magazine Cover" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Magazine Cover" onclick="openLightbox(this)">
         <img src="images/sa2.jpg" alt="Magazine Cover">
         <div class="work-overlay"><div class="work-cat">Magazine Cover</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/OrvaPoster1.webp" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
@@ -306,124 +310,124 @@
 
     </div><!-- /mainGrid -->
 
-    <div class="show-all-row">
+    <div class="show-all-row reveal reveal-up">
       <button class="btn-show-all" id="showAllBtn" onclick="toggleShowAll()">Show All Works ↓</button>
     </div>
 
     <div class="portfolio-grid-extra" id="extraGrid">
       
-      <div class="work-item" data-cat="YouTube Thumbnail" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="YouTube Thumbnail" onclick="openLightbox(this)">
         <img src="images/t1.png" alt="YouTube Thumbnail">
         <div class="work-overlay"><div class="work-cat">Thumbnail</div></div>
       </div>
 
-      <div class="work-item" data-cat="Branding" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Branding" onclick="openLightbox(this)">
         <img src="images/p1.jpg" alt="Social Media Poster">
         <div class="work-overlay"><div class="work-cat">Branding</div></div>
       </div>
       
-      <div class="work-item" data-cat="Bottle Label Print" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Bottle Label Print" onclick="openLightbox(this)">
         <img src="images/AlifBottleLabel.webp" alt="Bottle Label Print">
         <div class="work-overlay"><div class="work-cat">Bottle Label Print</div></div>
       </div>
 
-      <div class="work-item" data-cat="Business Card Print" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Business Card Print" onclick="openLightbox(this)">
         <img src="images/bc1.jpg" alt="Business Card Print">
         <div class="work-overlay"><div class="work-cat">Business Card Print</div></div>
       </div>
 
-      <div class="work-item" data-cat="Logo" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Logo" onclick="openLightbox(this)">
         <img src="images/RiplexLogo.webp" alt="Logo">
         <div class="work-overlay"><div class="work-cat">Logo</div></div>
       </div>
 
-      <div class="work-item" data-cat="Branding" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Branding" onclick="openLightbox(this)">
         <img src="images/p4.jpg" alt="Branding">
         <div class="work-overlay"><div class="work-cat">Branding</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/IrfanAdmission.webp" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/r1.jpg" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Magazine Cover" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Magazine Cover" onclick="openLightbox(this)">
         <img src="images/sa1.jpg" alt="Magazine Cover">
         <div class="work-overlay"><div class="work-cat">Magazine Cover</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/t2.png" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Logo" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Logo" onclick="openLightbox(this)">
         <img src="images/MagictoolLogo.webp" alt="Logo">
         <div class="work-overlay"><div class="work-cat">Logo</div></div>
       </div>
 
-      <div class="work-item" data-cat="Social Impact Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Social Impact Marketing" onclick="openLightbox(this)">
         <img src="images/MagictoolDrug.webp" alt="Social Impact Marketing">
         <div class="work-overlay"><div class="work-cat">Social Impact Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Thumbnail" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Thumbnail" onclick="openLightbox(this)">
         <img src="images/t3.png" alt="YouTube Thumbnail">
         <div class="work-overlay"><div class="work-cat">Thumbnail</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/sa3.jpg" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Marketing" onclick="openLightbox(this)">
         <img src="images/p2.jpg" alt="Marketing">
         <div class="work-overlay"><div class="work-cat">Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="Magazine Cover" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Magazine Cover" onclick="openLightbox(this)">
         <img src="images/sa4.jpg" alt="Magazine Cover">
         <div class="work-overlay"><div class="work-cat">Magazine Cover</div></div>
       </div>
 
-      <div class="work-item" data-cat="Logo" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Logo" onclick="openLightbox(this)">
         <img src="images/MovieHutLogo.webp" alt="Logo">
         <div class="work-overlay"><div class="work-cat">Logo</div></div>
       </div>
 
-      <div class="work-item" data-cat="Editorial Illustration" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Editorial Illustration" onclick="openLightbox(this)">
         <img src="images/LisanEid.webp" alt="Editorial Illustration">
         <div class="work-overlay"><div class="work-cat">Editorial Illustration</div></div>
       </div>
 
-      <div class="work-item" data-cat="Social Impact Marketing" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Social Impact Marketing" onclick="openLightbox(this)">
         <img src="images/MagictoolFather.webp" alt="Social Impact Marketing">
         <div class="work-overlay"><div class="work-cat">Social Impact Marketing</div></div>
       </div>
 
-      <div class="work-item" data-cat="YouTube Thumbnail" onclick="window.open('pdfs/OTUsthad.pdf', '_blank')">
+      <div class="work-item reveal reveal-up" data-cat="YouTube Thumbnail" onclick="window.open('pdfs/OTUsthad.pdf', '_blank')">
         <img src="pdfs/OTUsthadThumb.jpg" alt="YouTube Thumbnail">
         <div class="work-overlay"><div class="work-cat">Thumbnail</div></div>
         <div class="pdf-badge">PDF</div>
       </div>
 
-      <div class="work-item" data-cat="YouTube Thumbnail" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="YouTube Thumbnail" onclick="openLightbox(this)">
         <img src="images/t4.jpg" alt="YouTube Thumbnail">
         <div class="work-overlay"><div class="work-cat">Thumbnail</div></div>
       </div>
 
-      <div class="work-item" data-cat="Logo" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="Logo" onclick="openLightbox(this)">
         <img src="images/SaypinsLogo.webp" alt="Logo">
         <div class="work-overlay"><div class="work-cat">Logo</div></div>
       </div>
 
-      <div class="work-item" data-cat="YouTube Thumbnail" onclick="openLightbox(this)">
+      <div class="work-item reveal reveal-up" data-cat="YouTube Thumbnail" onclick="openLightbox(this)">
         <img src="images/t5.jpg" alt="YouTube Thumbnail">
         <div class="work-overlay"><div class="work-cat">Thumbnail</div></div>
       </div>
@@ -431,7 +435,7 @@
 
     </div><!-- /extraGrid -->
 
-    <div class="show-all-row" id="collapseRow" style="display:none; margin-top:1.5rem;">
+    <div class="show-all-row reveal reveal-up" id="collapseRow" style="display:none; margin-top:1.5rem;">
       <button class="btn-show-all" onclick="toggleShowAll()">Collapse ↑</button>
     </div>
 
@@ -443,7 +447,7 @@
   <div class="tab-panel" id="panel-web" style="display:none;">
     <div class="web-projects-grid">
 
-      <div class="web-card">
+      <div class="web-card reveal reveal-up">
         <div class="web-card-browser">
           <div class="browser-bar">
             <span class="browser-dot"></span>
@@ -501,22 +505,22 @@
   <div class="section-label">What I Offer</div>
   <h2 class="section-title">Services</h2>
   <div class="services-grid">
-    <div class="service-card">
+    <div class="service-card reveal reveal-up">
       <span class="service-icon">◈</span>
       <div class="service-name">Brand Identity</div>
       <div class="service-desc">Logo design, color palettes, typography systems, and brand guidelines that define your presence.</div>
     </div>
-    <div class="service-card">
+    <div class="service-card reveal reveal-up">
       <span class="service-icon">◉</span>
       <div class="service-name">Social Media Design</div>
       <div class="service-desc">Eye-catching Instagram posts, stories, reels covers, and campaign creatives that drive engagement.</div>
     </div>
-    <div class="service-card delay1">
+    <div class="service-card reveal reveal-up">
       <span class="service-icon">◻</span>
       <div class="service-name">Print & Marketing</div>
       <div class="service-desc">Brochures, flyers, posters, and print-ready layouts with precise production specifications.</div>
     </div>
-    <div class="service-card">
+    <div class="service-card reveal reveal-up">
       <span class="service-icon">◈</span>
       <div class="service-name">Campaign Reporting</div>
       <div class="service-desc">Data-driven performance dashboards using Excel, Google Sheets, and Power BI to inform strategy.</div>
@@ -541,7 +545,7 @@
 
   <div class="contact-info">
 
-    <a href="mailto:haseeb.direct@gmail.com" class="contact-info-item">
+    <a href="mailto:haseeb.direct@gmail.com" class="contact-info-item reveal reveal-left">
       <div class="contact-info-icon">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 7 10 7 10-7"/></svg>
       </div>
@@ -552,7 +556,7 @@
       <span class="contact-arrow">↗</span>
     </a>
 
-    <a href="https://wa.me/919745581670" target="_blank" rel="noopener" class="contact-info-item">
+    <a href="https://wa.me/919745581670" target="_blank" rel="noopener" class="contact-info-item reveal reveal-left">
       <div class="contact-info-icon">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.125.558 4.122 1.532 5.857L.057 23.882l6.204-1.448A11.945 11.945 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 0 1-5.007-1.371l-.36-.214-3.713.868.936-3.618-.235-.372A9.818 9.818 0 1 1 12 21.818z"/></svg>
       </div>
@@ -571,7 +575,7 @@
     <div>
       <form
         id="contactForm"
-        class="contact-form"
+        class="contact-form reveal reveal-right"
         action="https://formspree.io/f/xgodwvdn"
         method="POST"
         novalidate
@@ -1044,59 +1048,20 @@ window.addEventListener('DOMContentLoaded', () => {
       }
     });
   })();
-
-
-
-  // SCROLL REVEAL FOR EXPERIENCE ITEM ONLY
-  const elements = document.querySelectorAll('.exp-item');
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('show');
-      }
-    });
-  }, {
-    threshold: 0.2 // trigger when 30% visible 
-    });
-
-  elements.forEach(el => observer.observe(el));
   
   
-  // ── SCROLL REVEAL ──
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-        
-        if (window.innerWidth > 768 && entry.target.classList.contains('service-card')) {
-          setTimeout(() => {
-            entry.target.style.transitionDelay = '0s';
-          }, 800);
+  // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
         }
-      }
+      });
+    }, { threshold: 0.2 });
+    
+    document.querySelectorAll('.reveal').forEach(el => {
+      observer.observe(el);
     });
-  }, { threshold: 0.2 });
-  
-  document.querySelectorAll('.service-card').forEach((el, i) => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(18px)';
-    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
-    
-    if (window.innerWidth > 768) {
-      el.style.transitionDelay = `${0.45 + i * 0.1}s`;
-    }
-    
-    obs.observe(el);
-  });
-  
-  document.querySelectorAll('.contact-left, .to-up-btn, .contact-form, .work-item, .web-card').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(18px)';
-    el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
-    obs.observe(el);
-  });
 
 </script>
 </body>
