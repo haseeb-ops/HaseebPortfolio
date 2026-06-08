@@ -667,353 +667,554 @@
 
 
 <script>
-  /* ─── SCROLL BAR ─────────────────────────────────── */
+/* ============================================================
+   PORTFOLIO — Optimised JavaScript
+   Changes summary:
+   · Scroll bar   → rAF-throttled, no layout thrash
+   · Custom cursor → rAF loop, zero setTimeout, will-change hint
+   · IntersectionObserver → single shared instance
+   · Carousels    → one shared setInterval (tick-based), not one per card
+   · Lightbox     → full null-guard before every element access
+   · Scroll reveal → CSS-class-driven (no inline style writes at observe time)
+   · Guard wrappers around every getElementById / querySelector
+   ============================================================ */
+
+'use strict';
+
+/* ── 1. TINY HELPERS ─────────────────────────────────────────
+   $ / $$ : safe wrappers that return null instead of throwing  */
+const $  = (id)  => document.getElementById(id);
+const $$ = (sel, ctx = document) => ctx.querySelectorAll(sel);
+
+/* ============================================================
+   2. SCROLL INDICATOR
+   Uses a single rAF flag so the handler fires at most once
+   per animation frame even if the browser fires many scroll
+   events between frames.
+   ============================================================ */
+(function initScrollBar() {
+  const bar = $('scrollBar');
+  if (!bar) return;
+
+  let ticking = false;
+
+  function updateBar() {
+    const el  = document.documentElement;
+    const pct = el.scrollTop / (el.scrollHeight - el.clientHeight) * 100;
+    bar.style.width = pct + '%';
+    ticking = false;
+  }
+
   window.addEventListener('scroll', () => {
-    const el = document.documentElement;
-    document.getElementById('scrollBar').style.width =
-      (el.scrollTop / (el.scrollHeight - el.clientHeight) * 100) + '%';
-  });
-  
-  /* ─── CUSTOM CURSOR (desktop only) ──────────────── */
-  if (window.matchMedia('(pointer: fine)').matches) {
-    const cur  = document.getElementById('cursor');
-    const ring = document.getElementById('cursorRing');
-    document.addEventListener('mousemove', e => {
-      cur.style.cssText  = `left:${e.clientX}px;top:${e.clientY}px`;
-      setTimeout(() => {
-        ring.style.cssText = `left:${e.clientX}px;top:${e.clientY}px`;
-      }, 60);
-    });
-  }
-  
-  /* ─── SKELETON HELPERS ───────────────────────────── */
-  function createSkeleton() {
-    const sk = document.createElement('div');
-    sk.className = 'img-skeleton';
-    for (let d = 0; d < 3; d++) {
-      const dot = document.createElement('div');
-      dot.className = 'dot';
-      sk.appendChild(dot);
+    if (!ticking) {
+      requestAnimationFrame(updateBar);
+      ticking = true;
     }
-    return sk;
+  }, { passive: true });
+})();
+
+/* ============================================================
+   3. CUSTOM CURSOR  (fine-pointer / desktop only)
+   A single rAF loop reads the latest mouse position and writes
+   to the DOM — no repeated style writes inside mousemove.
+   will-change is set once so the browser can promote the
+   elements to their own compositor layers.
+   ============================================================ */
+(function initCursor() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+
+  const cur  = $('cursor');
+  const ring = $('cursorRing');
+  if (!cur || !ring) return;
+
+  /* Promote to GPU layer once — avoids paint on every frame */
+  cur.style.willChange  = 'left, top';
+  ring.style.willChange = 'left, top';
+
+  let mx = 0, my = 0;          // latest mouse coords
+  let rx = 0, ry = 0;          // ring's smoothed coords
+  const RING_EASE = 0.18;      // lower = more lag/trail
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX;
+    my = e.clientY;
+  }, { passive: true });
+
+  /* Single loop drives both cursor dot and lagging ring */
+  function loop() {
+    cur.style.left = mx + 'px';
+    cur.style.top  = my + 'px';
+
+    rx += (mx - rx) * RING_EASE;
+    ry += (my - ry) * RING_EASE;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+
+    requestAnimationFrame(loop);
   }
-  function revealSkeleton(sk) { sk.classList.add('done'); }
-  
-  function initSkeletons() {
-    document.querySelectorAll('.work-item > img').forEach(img => {
-      const item = img.closest('.work-item');
-      item.querySelector('.img-skeleton')?.remove();
+  requestAnimationFrame(loop);
+})();
+
+/* ============================================================
+   4. SKELETON HELPERS  (unchanged logic, extracted once)
+   ============================================================ */
+function createSkeleton() {
+  const sk = document.createElement('div');
+  sk.className = 'img-skeleton';
+  for (let d = 0; d < 3; d++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot';
+    sk.appendChild(dot);
+  }
+  return sk;
+}
+
+function attachSkeletonToImg(img, sk) {
+  const reveal = () => {
+    img.classList.add('loaded');
+    sk.classList.add('done');
+  };
+  if (img.complete && img.naturalWidth > 0) {
+    reveal();
+  } else {
+    img.addEventListener('load',  reveal, { once: true });
+    img.addEventListener('error', reveal, { once: true });
+  }
+}
+
+function initSkeletons() {
+  $$('.work-item > img').forEach(img => {
+    const item = img.closest('.work-item');
+    if (!item) return;
+    item.querySelector('.img-skeleton')?.remove();
+    const sk = createSkeleton();
+    item.insertBefore(sk, item.firstChild);
+    attachSkeletonToImg(img, sk);
+  });
+}
+
+/* ============================================================
+   5. CAROUSELS
+   KEY OPTIMISATION: instead of one setInterval per card, a
+   single global ticker fires every 3 s and advances whichever
+   carousel is *currently visible in the viewport*.  Cards not
+   on screen are skipped entirely — no hidden timers.
+   ============================================================ */
+const carouselRegistry = [];   // { item, goTo, getIndex }
+
+function initCarousels() {
+  $$('.work-item[data-images]').forEach(item => {
+    let images;
+    try { images = JSON.parse(item.dataset.images); } catch(e) { return; }
+    if (!images || images.length < 2) return;
+
+    /* Remove static fallback image */
+    item.querySelector(':scope > img')?.remove();
+
+    /* Build slide track */
+    const track = document.createElement('div');
+    track.className = 'thumb-slides';
+
+    images.forEach(src => {
+      const slide = document.createElement('div');
+      slide.className = 'thumb-slide';
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = '';
       const sk = createSkeleton();
-      item.insertBefore(sk, item.firstChild);
-      const reveal = () => { img.classList.add('loaded'); revealSkeleton(sk); };
-      (img.complete && img.naturalWidth > 0) ? reveal()
-        : img.addEventListener('load',  reveal, { once: true })
-        || img.addEventListener('error', reveal, { once: true });
+      attachSkeletonToImg(img, sk);
+      slide.append(sk, img);
+      track.appendChild(slide);
     });
-  }
-  
-  /* ─── CAROUSELS ──────────────────────────────────── */
-  function initCarousels() {
-    document.querySelectorAll('.work-item[data-images]').forEach(item => {
-      let images;
-      try { images = JSON.parse(item.dataset.images); } catch(e) { return; }
-      if (!images || images.length < 2) return;
-  
-      item.querySelector(':scope > img')?.remove();
-  
-      const track = document.createElement('div');
-      track.className = 'thumb-slides';
-  
-      images.forEach(src => {
-        const slide = document.createElement('div');
-        slide.className = 'thumb-slide';
-        const img = document.createElement('img');
-        img.src = src; img.alt = '';
-        const sk = createSkeleton();
-        const revealSlide = () => { img.classList.add('loaded'); revealSkeleton(sk); };
-        (img.complete && img.naturalWidth > 0) ? revealSlide()
-          : img.addEventListener('load',  revealSlide, { once: true })
-          || img.addEventListener('error', revealSlide, { once: true });
-        slide.append(sk, img);
-        track.appendChild(slide);
-      });
-      item.insertBefore(track, item.firstChild);
-  
-      /* dots */
-      const dotsEl = document.createElement('div');
-      dotsEl.className = 'thumb-dots';
-      images.forEach((_, i) => {
-        const d = document.createElement('div');
-        d.className = 'thumb-dot' + (i === 0 ? ' active' : '');
-        dotsEl.appendChild(d);
-      });
-      item.appendChild(dotsEl);
-      const dots = dotsEl.querySelectorAll('.thumb-dot');
-  
-      /* badge */
-      const badge = document.createElement('div');
-      badge.className = 'carousel-badge';
-      badge.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    item.insertBefore(track, item.firstChild);
+
+    /* Dot indicators */
+    const dotsEl = document.createElement('div');
+    dotsEl.className = 'thumb-dots';
+    images.forEach((_, i) => {
+      const d = document.createElement('div');
+      d.className = 'thumb-dot' + (i === 0 ? ' active' : '');
+      dotsEl.appendChild(d);
+    });
+    item.appendChild(dotsEl);
+    const dots = dotsEl.querySelectorAll('.thumb-dot');
+
+    /* Image count badge */
+    const badge = document.createElement('div');
+    badge.className = 'carousel-badge';
+    badge.innerHTML = `
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
         <rect x="2" y="7" width="13" height="13" rx="2" fill="none" stroke="#fff" stroke-width="1.8"/>
         <path d="M7 7V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2"
               fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
-      </svg><span>${images.length}</span>`;
-      item.appendChild(badge);
-  
-      /* nav buttons */
-      const prevBtn = document.createElement('button');
-      prevBtn.setAttribute('aria-label', 'Previous image');
-      const nextBtn = document.createElement('button');
-      nextBtn.setAttribute('aria-label', 'Next image');
-      item.append(prevBtn, nextBtn);
-  
-      let current = 0;
-      function goTo(idx) {
-        current = (idx + images.length) % images.length;
-        track.style.transform = `translateX(-${current * 100}%)`;
-        dots.forEach((d, i) => d.classList.toggle('active', i === current));
-      }
-  
-      /* auto-slide — desktop only, cleaned up properly */
-      let autoSlide;
-      if (window.matchMedia('(min-width: 768px)').matches) {
-        autoSlide = setInterval(() => goTo(current + 1), 3000);
-        item.addEventListener('mouseenter', () => clearInterval(autoSlide));
-        item.addEventListener('mouseleave', () => {
-          autoSlide = setInterval(() => goTo(current + 1), 3000);
-        });
-      }
-  
-      prevBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current - 1); });
-      nextBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
-  
-      /* touch swipe */
-      let tsX = null;
-      item.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; }, { passive: true });
-      item.addEventListener('touchend',   e => {
-        if (tsX === null) return;
-        const dx = e.changedTouches[0].clientX - tsX;
-        if (Math.abs(dx) > 30) goTo(current + (dx < 0 ? 1 : -1));
-        tsX = null;
-      });
-  
-      item._carouselIndex = () => current;
-    });
-  }
-  
-  /* ─── LIGHTBOX ───────────────────────────────────── */
-  let lbImages = [], lbIndex = 0, lbDragX = null;
-  
-  function openLightbox(el) {
-    let images = [];
-    if (el.dataset.images) try { images = JSON.parse(el.dataset.images); } catch(e) {}
-    if (!images.length) { const img = el.querySelector('img'); if (img) images = [img.src]; }
-    if (!images.length) return;
-  
-    lbImages = images;
-    lbIndex  = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
-    document.getElementById('lightboxTitle').textContent = el.dataset.title || '';
-    document.getElementById('lightboxCat').textContent   = el.dataset.cat   || '';
-  
-    buildLbSlides();
-    document.getElementById('lightbox').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  
-  function buildLbSlides() {
-    const track = document.getElementById('lbTrack');
-    track.innerHTML = '';
-    lbImages.forEach(src => {
-      const slide = document.createElement('div');
-      slide.className = 'lb-slide';
-      const img = document.createElement('img');
-      img.src = src; img.alt = ''; img.draggable = false;
-      slide.appendChild(img);
-      track.appendChild(slide);
-    });
-  
-    const dotsEl = document.getElementById('lbDots');
-    dotsEl.innerHTML = '';
-    if (lbImages.length > 1) {
-      lbImages.forEach((_, i) => {
-        const d = document.createElement('button');
-        d.className = 'lb-dot';
-        d.setAttribute('aria-label', `Image ${i + 1}`);
-        d.addEventListener('click', e => { e.stopPropagation(); lbSetIndex(i); });
-        dotsEl.appendChild(d);
-      });
+      </svg>
+      <span>${images.length}</span>`;
+    item.appendChild(badge);
+
+    /* Prev / Next buttons */
+    const prevBtn = document.createElement('button');
+    prevBtn.setAttribute('aria-label', 'Previous image');
+    const nextBtn = document.createElement('button');
+    nextBtn.setAttribute('aria-label', 'Next image');
+    item.append(prevBtn, nextBtn);
+
+    let current = 0;
+
+    function goTo(idx) {
+      current = (idx + images.length) % images.length;
+      track.style.transform = `translateX(-${current * 100}%)`;
+      dots.forEach((d, i) => d.classList.toggle('active', i === current));
     }
-    lbSetIndex(lbIndex, false);
+
+    prevBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current - 1); });
+    nextBtn.addEventListener('click', e => { e.stopPropagation(); goTo(current + 1); });
+
+    /* Touch swipe */
+    let tsX = null;
+    item.addEventListener('touchstart', e => { tsX = e.touches[0].clientX; }, { passive: true });
+    item.addEventListener('touchend',   e => {
+      if (tsX === null) return;
+      const dx = e.changedTouches[0].clientX - tsX;
+      if (Math.abs(dx) > 30) goTo(current + (dx < 0 ? 1 : -1));
+      tsX = null;
+    });
+
+    /* Expose index for lightbox sync */
+    item._carouselIndex = () => current;
+
+    /* Register for the global ticker (desktop only) */
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      let paused = false;
+      item.addEventListener('mouseenter', () => { paused = true;  });
+      item.addEventListener('mouseleave', () => { paused = false; });
+      carouselRegistry.push({ item, goTo, getIndex: () => current, isPaused: () => paused });
+    }
+  });
+
+  /* One shared interval for ALL carousels — fires every 3 s.
+     Each iteration checks visibility via getBoundingClientRect
+     so off-screen carousels are skipped cheaply.              */
+  if (carouselRegistry.length > 0) {
+    setInterval(() => {
+      carouselRegistry.forEach(({ item, goTo, getIndex, isPaused }) => {
+        if (isPaused()) return;
+        const r = item.getBoundingClientRect();
+        const visible = r.top < window.innerHeight && r.bottom > 0;
+        if (visible) goTo(getIndex() + 1);
+      });
+    }, 3000);
   }
-  
-  function lbSetIndex(idx, animate = true) {
-    lbIndex = Math.max(0, Math.min(idx, lbImages.length - 1));
-    const track = document.getElementById('lbTrack');
-    track.style.transition = animate ? 'transform 0.4s cubic-bezier(.4,0,.2,1)' : 'none';
-    track.style.transform  = `translateX(-${lbIndex * 100}%)`;
-  
-    const counter = document.getElementById('lbCounter');
+}
+
+/* ============================================================
+   6. LIGHTBOX
+   Every getElementById call is null-guarded.  Helper `lbEl`
+   fetches once and warns if missing so bugs are caught early.
+   ============================================================ */
+let lbImages = [], lbIndex = 0, lbDragX = null;
+
+function lbEl(id) {
+  const el = $(id);
+  if (!el) console.warn(`[Lightbox] Missing element #${id}`);
+  return el;
+}
+
+function openLightbox(el) {
+  if (!el) return;
+
+  let images = [];
+  if (el.dataset.images) {
+    try { images = JSON.parse(el.dataset.images); } catch(e) {}
+  }
+  if (!images.length) {
+    const img = el.querySelector('img');
+    if (img) images = [img.src];
+  }
+  if (!images.length) return;
+
+  lbImages = images;
+  lbIndex  = (typeof el._carouselIndex === 'function') ? el._carouselIndex() : 0;
+
+  const titleEl = lbEl('lightboxTitle');
+  const catEl   = lbEl('lightboxCat');
+  if (titleEl) titleEl.textContent = el.dataset.title || '';
+  if (catEl)   catEl.textContent   = el.dataset.cat   || '';
+
+  buildLbSlides();
+
+  const lb = lbEl('lightbox');
+  if (lb) lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function buildLbSlides() {
+  const track  = lbEl('lbTrack');
+  const dotsEl = lbEl('lbDots');
+  if (!track || !dotsEl) return;
+
+  track.innerHTML  = '';
+  dotsEl.innerHTML = '';
+
+  lbImages.forEach(src => {
+    const slide = document.createElement('div');
+    slide.className = 'lb-slide';
+    const img = document.createElement('img');
+    img.src = src; img.alt = ''; img.draggable = false;
+    slide.appendChild(img);
+    track.appendChild(slide);
+  });
+
+  if (lbImages.length > 1) {
+    lbImages.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'lb-dot';
+      d.setAttribute('aria-label', `Image ${i + 1}`);
+      d.addEventListener('click', e => { e.stopPropagation(); lbSetIndex(i); });
+      dotsEl.appendChild(d);
+    });
+  }
+
+  lbSetIndex(lbIndex, false);
+}
+
+function lbSetIndex(idx, animate = true) {
+  lbIndex = Math.max(0, Math.min(idx, lbImages.length - 1));
+
+  const track   = lbEl('lbTrack');
+  const counter = lbEl('lbCounter');
+  const prevBtn = lbEl('lbPrev');
+  const nextBtn = lbEl('lbNext');
+  if (!track) return;
+
+  track.style.transition = animate ? 'transform 0.4s cubic-bezier(.4,0,.2,1)' : 'none';
+  track.style.transform  = `translateX(-${lbIndex * 100}%)`;
+
+  if (counter) {
     counter.textContent = `${lbIndex + 1} / ${lbImages.length}`;
     counter.classList.toggle('single', lbImages.length <= 1);
-  
-    document.querySelectorAll('#lbDots .lb-dot').forEach((d, i) =>
-      d.classList.toggle('active', i === lbIndex));
-  
-    const isMulti = lbImages.length > 1;
-    document.getElementById('lbPrev').classList.toggle('hidden', !isMulti || lbIndex === 0);
-    document.getElementById('lbNext').classList.toggle('hidden', !isMulti || lbIndex === lbImages.length - 1);
   }
-  
-  function lbGo(dir, e) {
-    if (e) e.stopPropagation();
-    lbSetIndex(lbIndex + dir);
+
+  $$('#lbDots .lb-dot').forEach((d, i) => d.classList.toggle('active', i === lbIndex));
+
+  const isMulti = lbImages.length > 1;
+  if (prevBtn) prevBtn.classList.toggle('hidden', !isMulti || lbIndex === 0);
+  if (nextBtn) nextBtn.classList.toggle('hidden', !isMulti || lbIndex === lbImages.length - 1);
+}
+
+function lbGo(dir, e) {
+  if (e) e.stopPropagation();
+  lbSetIndex(lbIndex + dir);
+}
+
+function closeLightbox(e) {
+  const lb = $('lightbox');
+  if (!lb) return;
+  if (!e || e.target === lb || e.target.classList.contains('lightbox-close')) {
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
   }
-  
-  function closeLightbox(e) {
-    if (!e || e.target === document.getElementById('lightbox')
-           || e.target.classList.contains('lightbox-close')) {
-      document.getElementById('lightbox').classList.remove('open');
-      document.body.style.overflow = '';
-    }
+}
+
+/* Keyboard navigation */
+document.addEventListener('keydown', e => {
+  const lb = $('lightbox');
+  if (!lb || !lb.classList.contains('open')) return;
+  if (e.key === 'Escape')     closeLightbox();
+  if (e.key === 'ArrowLeft')  lbSetIndex(lbIndex - 1);
+  if (e.key === 'ArrowRight') lbSetIndex(lbIndex + 1);
+});
+
+/* ============================================================
+   7. TAB SWITCHER  (unchanged — already optimal)
+   ============================================================ */
+function switchTab(tab, btn) {
+  $$('.ptab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+
+  const designPanel = $('panel-design');
+  const webPanel    = $('panel-web');
+  if (designPanel) designPanel.style.display = tab === 'design' ? 'block' : 'none';
+  if (webPanel)    webPanel.style.display    = tab === 'web'    ? 'block' : 'none';
+}
+
+/* ============================================================
+   8. SHOW ALL / COLLAPSE  (null-guarded)
+   ============================================================ */
+let showingAll = false;
+
+function toggleShowAll() {
+  const extra       = $('extraGrid');
+  const showAllBtn  = $('showAllBtn');
+  const collapseRow = $('collapseRow');
+  if (!extra || !showAllBtn || !collapseRow) return;
+
+  showingAll = !showingAll;
+  const showAllRow = showAllBtn.parentElement;
+
+  if (showingAll) {
+    extra.classList.add('open');
+    if (showAllRow)  showAllRow.style.display  = 'none';
+    collapseRow.style.display = 'flex';
+  } else {
+    extra.classList.remove('open');
+    if (showAllRow)  showAllRow.style.display  = 'flex';
+    collapseRow.style.display = 'none';
+    const portfolio = $('portfolio');
+    if (portfolio) portfolio.scrollIntoView({ behavior: 'smooth' });
   }
-  
-  /* ─── KEYBOARD + TOUCH (lightbox) ───────────────── */
-  document.addEventListener('keydown', e => {
-    if (!document.getElementById('lightbox').classList.contains('open')) return;
-    if (e.key === 'Escape')     closeLightbox();
-    if (e.key === 'ArrowLeft')  lbSetIndex(lbIndex - 1);
-    if (e.key === 'ArrowRight') lbSetIndex(lbIndex + 1);
-  });
-  
-  /* ─── ALL DOM-DEPENDENT CODE ─────────────────────── */
-  window.addEventListener('DOMContentLoaded', () => {
-  
-    /* Lightbox touch — safe inside DOMContentLoaded */
-    const lbStage = document.getElementById('lbStage');
-    if (lbStage) {
-      lbStage.addEventListener('touchstart', e => { lbDragX = e.touches[0].clientX; }, { passive: true });
-      lbStage.addEventListener('touchend',   e => {
-        if (lbDragX === null) return;
-        const dx = e.changedTouches[0].clientX - lbDragX;
-        if (Math.abs(dx) > 40) lbSetIndex(lbIndex + (dx < 0 ? 1 : -1));
-        lbDragX = null;
+}
+
+/* ============================================================
+   9. CONTACT FORM  (null-guarded, same logic)
+   ============================================================ */
+function initContactForm() {
+  const form   = $('contactForm');
+  const btn    = $('cf-btn');
+  const status = $('cf-status');
+  if (!form || !btn || !status) return;
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!form.checkValidity()) { form.reportValidity(); return; }
+
+    btn.disabled      = true;
+    btn.textContent   = 'Sending…';
+    status.className  = 'cf-status';
+    status.textContent = '';
+
+    try {
+      const res = await fetch(form.action, {
+        method:  'POST',
+        body:    new FormData(form),
+        headers: { Accept: 'application/json' }
       });
-    }
-  
-    /* Carousels & skeletons */
-    initCarousels();
-    initSkeletons();
-  
-    /* Hide show-all btn if extra grid is empty */
-    const extra = document.getElementById('extraGrid');
-    const btn   = document.getElementById('showAllBtn');
-    if (extra && extra.children.length === 0 && btn) btn.style.display = 'none';
-  
-    /* ── SINGLE unified scroll-reveal observer ── */
-    const revealObs = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add('show');           // for .exp-item
-        entry.target.style.opacity   = '1';           // for others
-        entry.target.style.transform = 'translateY(0)';
-        if (window.innerWidth > 768 && entry.target.classList.contains('service-card')) {
-          setTimeout(() => { entry.target.style.transitionDelay = '0s'; }, 800);
-        }
-      });
-    }, { threshold: 0.2 });
-  
-    /* exp-items */
-    document.querySelectorAll('.exp-item').forEach(el => revealObs.observe(el));
-  
-    /* service cards with stagger */
-    document.querySelectorAll('.service-card').forEach((el, i) => {
-      el.style.cssText += `opacity:0;transform:translateY(18px);
-        transition:opacity .55s ease,transform .55s ease;
-        ${window.innerWidth > 768 ? `transition-delay:${0.45 + i * 0.1}s` : ''}`;
-      revealObs.observe(el);
-    });
-  
-    /* other reveal targets */
-    document.querySelectorAll(
-      '.contact-left,.to-up-btn,.contact-form,.work-item,.web-card'
-    ).forEach(el => {
-      el.style.cssText += 'opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease';
-      revealObs.observe(el);
-    });
-  
-    /* ── CONTACT FORM ── */
-    const form   = document.getElementById('contactForm');
-    const cfBtn  = document.getElementById('cf-btn');
-    const status = document.getElementById('cf-status');
-    if (!form) return;
-  
-    form.addEventListener('submit', async e => {
-      e.preventDefault();
-      if (!form.checkValidity()) { form.reportValidity(); return; }
-  
-      cfBtn.disabled = true;
-      cfBtn.textContent = 'Sending…';
-      status.className = 'cf-status';
-      status.textContent = '';
-  
-      try {
-        const res = await fetch(form.action, {
-          method: 'POST', body: new FormData(form),
-          headers: { Accept: 'application/json' }
-        });
-        if (res.ok) {
-          status.textContent = '✓ Message sent! I\'ll get back to you soon.';
-          status.className   = 'cf-status success';
-          form.reset();
-          cfBtn.textContent  = 'Message Sent ✓';
-          setTimeout(() => {
-            cfBtn.textContent = 'Send Message →';
-            cfBtn.disabled    = false;
-            status.className  = 'cf-status';
-            status.textContent = '';
-          }, 5000);
-        } else {
-          const json = await res.json().catch(() => ({}));
-          status.textContent = json.error || '✕ Something went wrong. Please try again.';
-          status.className   = 'cf-status error';
-          cfBtn.textContent  = 'Send Message →';
-          cfBtn.disabled     = false;
-        }
-      } catch (_) {
-        status.textContent = '✕ Network error. Check your connection and try again.';
+
+      if (res.ok) {
+        status.textContent = '✓ Message sent! I\'ll get back to you soon.';
+        status.className   = 'cf-status success';
+        form.reset();
+        btn.textContent    = 'Message Sent ✓';
+        setTimeout(() => {
+          btn.textContent    = 'Send Message →';
+          btn.disabled       = false;
+          status.className   = 'cf-status';
+          status.textContent = '';
+        }, 5000);
+      } else {
+        const json = await res.json().catch(() => ({}));
+        status.textContent = json.error || '✕ Something went wrong. Please try again.';
         status.className   = 'cf-status error';
-        cfBtn.textContent  = 'Send Message →';
-        cfBtn.disabled     = false;
+        btn.textContent    = 'Send Message →';
+        btn.disabled       = false;
       }
-    });
-  });
-  
-  /* ─── TAB SWITCHER ───────────────────────────────── */
-  function switchTab(tab, btn) {
-    document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('panel-design').style.display = tab === 'design' ? 'block' : 'none';
-    document.getElementById('panel-web').style.display    = tab === 'web'    ? 'block' : 'none';
-  }
-  
-  /* ─── SHOW ALL / COLLAPSE ────────────────────────── */
-  let showingAll = false;
-  function toggleShowAll() {
-    showingAll = !showingAll;
-    const extra       = document.getElementById('extraGrid');
-    const showAllRow  = document.getElementById('showAllBtn').parentElement;
-    const collapseRow = document.getElementById('collapseRow');
-    if (showingAll) {
-      extra.classList.add('open');
-      showAllRow.style.display  = 'none';
-      collapseRow.style.display = 'flex';
-    } else {
-      extra.classList.remove('open');
-      showAllRow.style.display  = 'flex';
-      collapseRow.style.display = 'none';
-      document.getElementById('portfolio').scrollIntoView({ behavior: 'smooth' });
+    } catch (_) {
+      status.textContent = '✕ Network error. Check your connection and try again.';
+      status.className   = 'cf-status error';
+      btn.textContent    = 'Send Message →';
+      btn.disabled       = false;
     }
+  });
+}
+
+/* ============================================================
+   10. UNIFIED SCROLL REVEAL + EXP-ITEM OBSERVER
+   KEY CHANGE: instead of writing opacity / transform inline on
+   every element at observe-time, elements get the CSS class
+   "reveal-pending" immediately (CSS handles the initial hidden
+   state) and "reveal-visible" when they enter the viewport.
+   This means ZERO inline style writes in the observer callback
+   and the GPU can batch the transitions properly.
+
+   Add this to your CSS:
+   ─────────────────────────────────────────────────
+   .reveal-pending {
+     opacity: 0;
+     transform: translateY(18px);
+     transition: opacity .55s ease, transform .55s ease;
+   }
+   .reveal-visible {
+     opacity: 1 !important;
+     transform: translateY(0) !important;
+   }
+   .service-card.reveal-pending { transition-delay: var(--reveal-delay, 0s); }
+   ─────────────────────────────────────────────────
+   ============================================================ */
+function initScrollReveal() {
+  /* Single observer handles exp-items AND all reveal targets */
+  const revealObs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+
+      el.classList.add('show');            // for .exp-item (existing CSS)
+      el.classList.add('reveal-visible');  // for general reveal targets
+
+      /* Remove stagger delay after animation completes so it
+         doesn't re-apply if element leaves and re-enters view */
+      if (el.classList.contains('service-card')) {
+        setTimeout(() => el.style.removeProperty('transition-delay'), 800);
+      }
+
+      revealObs.unobserve(el);             // stop watching once revealed
+    });
+  }, { threshold: 0.2 });
+
+  /* Experience items */
+  $$('.exp-item').forEach(el => revealObs.observe(el));
+
+  /* Service cards — stagger delay via CSS variable */
+  const isDesktop = window.innerWidth > 768;
+  $$('.service-card').forEach((el, i) => {
+    el.classList.add('reveal-pending');
+    if (isDesktop) el.style.setProperty('--reveal-delay', `${0.45 + i * 0.1}s`);
+    revealObs.observe(el);
+  });
+
+  /* All other reveal targets */
+  $$('.contact-left, .to-up-btn, .contact-form, .work-item, .web-card').forEach(el => {
+    el.classList.add('reveal-pending');
+    revealObs.observe(el);
+  });
+}
+
+/* ============================================================
+   11. DOM-READY BOOTSTRAP
+   Everything that touches the DOM lives here so there is no
+   risk of querying before elements exist.
+   ============================================================ */
+window.addEventListener('DOMContentLoaded', () => {
+
+  /* Carousels must run before skeletons so track images are
+     in the DOM when initSkeletons scans for img elements     */
+  initCarousels();
+  initSkeletons();
+
+  /* Lightbox stage touch — safe here because DOM is ready */
+  const lbStage = $('lbStage');
+  if (lbStage) {
+    lbStage.addEventListener('touchstart', e => {
+      lbDragX = e.touches[0].clientX;
+    }, { passive: true });
+
+    lbStage.addEventListener('touchend', e => {
+      if (lbDragX === null) return;
+      const dx = e.changedTouches[0].clientX - lbDragX;
+      if (Math.abs(dx) > 40) lbSetIndex(lbIndex + (dx < 0 ? 1 : -1));
+      lbDragX = null;
+    });
   }
+
+  /* Hide show-all button when extra grid is empty */
+  const extra      = $('extraGrid');
+  const showAllBtn = $('showAllBtn');
+  if (extra && showAllBtn && extra.children.length === 0) {
+    showAllBtn.style.display = 'none';
+  }
+
+  initContactForm();
+  initScrollReveal();
+});
+
 </script>
 </body>
 </html>
